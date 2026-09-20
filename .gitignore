@@ -1,0 +1,8 @@
+# Este repositório é PÚBLICO e leva só o que o site serve.
+# Rede de segurança: notas de desenvolvimento, segredos e dependências nunca entram aqui.
+REFACTORING*.md
+.env
+*.env
+node_modules/
+.DS_Store
+Thumbs.db

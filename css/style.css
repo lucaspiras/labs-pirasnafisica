@@ -1,0 +1,1999 @@
+/* =========================
+   FONTE
+========================= */
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700;800&family=Space+Mono:wght@400;700&display=swap');
+
+/* =========================
+   VARIÁVEIS
+========================= */
+:root {
+  /* Cores da marca */
+  --azul-escuro: #1e2a78;
+  --azul: #2f5bea;
+  --roxo: #6a2fe8;
+  --amarelo: #facc15;
+  --laranja: #fb923c;
+
+  /* Tokens semânticos — tema claro (fundo dourado leve + neutros harmonizados) */
+  --bg: #faf6ea;
+  --surface: #ffffff;
+  --surface-2: #f2ecda;
+  --border: #e7ddc6;
+  --texto: #1f2933;
+  --text-muted: #5b6573;
+  --shadow: rgba(0, 0, 0, 0.08);
+  --shadow-forte: rgba(0, 0, 0, 0.12);
+
+  /* Títulos de conteúdo */
+  --titulo: #1e2a78;
+  --subtitulo: #2f5bea;
+
+  /* Caixas semânticas */
+  --info-bg: #eff6ff;
+  --info-border: #bfdbfe;
+  --info-text: #1e3a8a;
+  --warn-bg: #fffbeb;
+  --warn-border: #fde68a;
+  --warn-text: #78350f;
+  --danger-bg: #fff1f2;
+  --danger-border: #fecdd3;
+  --danger-text: #7f1d1d;
+  --ok-bg: #f0fdf4;
+  --ok-border: #86efac;
+  --ok-text: #166534;
+
+  /* Legado (alias) */
+  --fundo-claro: var(--bg);
+
+  /* Tipografia */
+  --font-body: 'DM Sans', 'Segoe UI', sans-serif;
+  --font-mono: 'Space Mono', 'Courier New', monospace;
+}
+
+/* Tema escuro — mesma paleta dos estudos dirigidos */
+[data-theme="dark"] {
+  --bg: #0b0e14;
+  --surface: #13181f;
+  --surface-2: #1a2130;
+  --border: #232d3d;
+  --texto: #e2e8f0;
+  --text-muted: #7a8fa6;
+  --shadow: rgba(0, 0, 0, 0.45);
+  --shadow-forte: rgba(0, 0, 0, 0.6);
+
+  --titulo: #c7d2fe;
+  --subtitulo: #8fb0ff;
+
+  --info-bg: #101c30;
+  --info-border: #274569;
+  --info-text: #bfdbfe;
+  --warn-bg: #2a2310;
+  --warn-border: #5c4a16;
+  --warn-text: #fde68a;
+  --danger-bg: #2b1216;
+  --danger-border: #6b2230;
+  --danger-text: #fecdd3;
+  --ok-bg: #0f2417;
+  --ok-border: #2f6b45;
+  --ok-text: #86efac;
+}
+
+/* =========================
+   CORES POR TEMA DE CONTEÚDO
+   Ativadas por data-tema="<pasta>" no <body> das páginas de conteudos/.
+   Ficam aqui (e não em conteudos/shared.css) porque os hubs de tema carregam
+   apenas este arquivo.
+
+   Cada tema define 3 cores:
+   --tema-deep   → cor escura (stop inicial do gradiente)
+   --tema-cor    → cor "mid", legível sobre o creme do site (bordas, links, acentos)
+   --tema-light  → cor clara (stop final do gradiente)
+   E duas derivadas:
+   --tema-grad   → gradiente deep → cor → light (banner, número da seção, índice, tabelas)
+   --tema-strong → cor de TEXTO de títulos e rótulos: deep no claro, light no escuro
+
+   CRITÉRIO DA PALETA — não escolher cor "no olho" ao criar uma seção nova.
+   Cada tema recebe a cor que o fenômeno evoca, respeitando separação mínima de
+   matiz (~20° entre quaisquer dois temas) para que nenhum par se confunda:
+
+     grandezas-fisicas  ardósia   base neutra da física: régua, balança, medição
+     cinematica         azul      movimento
+     dinamica           verde     força e as leis de Newton (a maçã 🍎 destaca)
+     trabalho-energia   laranja   combustível, calorias
+     optica             magenta   dispersão da luz no prisma
+     eletricidade       dourado   raio
+     termodinamica      vermelho  calor
+     ondulatoria        teal      ondas, mar
+     fisica-moderna     violeta   quântico, ultravioleta
+
+   Os três quentes (termodinâmica 0°, energia 22°, eletricidade 43°) são vizinhos
+   de propósito: formam a família calor/energia/eletricidade. Os stops claros
+   (coral, laranja, amarelo) os mantêm distinguíveis.
+========================= */
+[data-tema="grandezas-fisicas"] { --tema-deep:#1e293b; --tema-cor:#475569; --tema-light:#64748b; }
+[data-tema="cinematica"]        { --tema-deep:#1e3a8a; --tema-cor:#1d4ed8; --tema-light:#3b82f6; }
+[data-tema="dinamica"]          { --tema-deep:#14532d; --tema-cor:#15803d; --tema-light:#22c55e; }
+[data-tema="trabalho-energia"]  { --tema-deep:#7c2d12; --tema-cor:#c2410c; --tema-light:#f97316; }
+[data-tema="optica"]            { --tema-deep:#701a75; --tema-cor:#a21caf; --tema-light:#d946ef; }
+[data-tema="eletricidade"]      { --tema-deep:#713f12; --tema-cor:#a16207; --tema-light:#eab308; }
+[data-tema="termodinamica"]     { --tema-deep:#7f1d1d; --tema-cor:#b91c1c; --tema-light:#ef4444; }
+[data-tema="ondulatoria"]       { --tema-deep:#134e4a; --tema-cor:#0f766e; --tema-light:#14b8a6; }
+[data-tema="fisica-moderna"]    { --tema-deep:#4c1d95; --tema-cor:#6d28d9; --tema-light:#a78bfa; }
+
+/* Derivadas — assim trocar a cor de um tema é editar uma linha só, acima. */
+[data-tema] {
+  --tema-grad: linear-gradient(135deg, var(--tema-deep) 0%, var(--tema-cor) 55%, var(--tema-light) 100%);
+  --tema-strong: var(--tema-deep);
+}
+
+/* No escuro, --tema-strong (só cor de texto) subiria ilegível sobre o fundo #0b0e14,
+   então os títulos passam a usar o stop claro. O gradiente segue com --tema-deep e
+   não é afetado: lá a cor escura aparece como fundo, com texto branco por cima. */
+[data-theme="dark"] [data-tema] { --tema-strong: var(--tema-light); }
+
+/* =========================
+   RESET
+========================= */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: var(--font-body);
+  background: var(--fundo-claro);
+  color: var(--texto);
+  line-height: 1.6;
+}
+
+/* =========================
+   HEADER
+========================= */
+header {
+  
+  background: var(--surface);
+  box-shadow: 0 4px 12px var(--shadow);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+.header-container {
+  max-width: 1300px;
+  margin: 0 auto;
+  padding: 0.75rem 2rem;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* LOGO */
+.logo-link {
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  transition: opacity 0.3s ease;
+}
+
+.logo-link:hover {
+  opacity: 0.8;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.logo img {
+  height: 72px;
+  display: block;
+}
+
+.logo-text {
+  font-size: 1.35rem;
+  font-weight: 800;
+  letter-spacing: 0.3px;
+
+  background: linear-gradient(
+    90deg,
+    #facc15,
+    #fb923c,
+    #6a2fe8,
+    #2f5bea
+  );
+
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  color: transparent;
+
+  white-space: nowrap;
+}
+
+/* MENU */
+nav ul {
+  list-style: none;
+  display: flex;
+  gap: 1.5rem;
+}
+
+nav a {
+  text-decoration: none;
+  font-weight: 500;
+  color: var(--texto);
+  position: relative;
+  padding: 0.25rem 0;
+}
+
+/* sublinhado animado */
+nav a::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -4px;
+  width: 0;
+  height: 2px;
+  background: #6a2fe8;
+  transition: width 0.25s ease;
+}
+
+nav a:hover::after {
+  width: 100%;
+}
+
+nav .feedback-badge {
+  padding: 0.5rem 0.9rem;
+  border-radius: 999px;
+  background: var(--surface-2);
+  color: var(--texto);
+  font-weight: 700;
+}
+
+nav button.feedback-badge {
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: inherit;
+  line-height: 1;
+  vertical-align: middle;
+}
+
+nav .feedback-badge:hover {
+  background: var(--border);
+}
+
+.feedback-page {
+  padding: 4rem 2rem;
+  min-height: calc(100vh - 220px);
+  background: var(--bg);
+}
+
+.feedback-card {
+  max-width: 760px;
+  margin: 0 auto;
+  background: var(--surface);
+  border-radius: 24px;
+  box-shadow: 0 20px 50px var(--shadow);
+  padding: 2.5rem;
+}
+
+.page-heading {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 1rem;
+  align-items: center;
+  margin-bottom: 1.75rem;
+}
+
+.feedback-icon {
+  display: inline-flex;
+  width: 3rem;
+  height: 3rem;
+  align-items: center;
+  justify-content: center;
+  border-radius: 1rem;
+  background: var(--surface-2);
+  font-size: 1.45rem;
+}
+
+.feedback-page h1 {
+  font-size: 2rem;
+  margin-bottom: 0.4rem;
+}
+
+.feedback-page p {
+  color: var(--text-muted);
+}
+
+.feedback-form {
+  display: grid;
+  gap: 1rem;
+}
+
+.feedback-form label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 0.35rem;
+}
+
+.feedback-form input,
+.feedback-form textarea {
+  width: 100%;
+  padding: 1rem 1.1rem;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: var(--bg);
+  font-size: 0.98rem;
+  color: var(--texto);
+}
+
+.feedback-form textarea {
+  min-height: 170px;
+  resize: vertical;
+}
+
+.radio-row {
+  display: flex;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.radio-row label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 500;
+}
+
+.feedback-note {
+  font-size: 0.95rem;
+  color: var(--text-muted);
+  margin-top: 0.25rem;
+}
+
+.feedback-success {
+  font-size: 1rem;
+  color: #134e4a;
+  background: #d1fae5;
+  border: 1px solid #a7f3d0;
+  border-radius: 16px;
+  padding: 1rem;
+}
+
+.feedback-error,
+.feedback-error-detail {
+  font-size: 1rem;
+  color: #b91c1c;
+}
+
+.feedback-error-detail {
+  margin-top: 0.75rem;
+  padding: 1rem;
+  background: #fee2e2;
+  border-radius: 16px;
+  overflow-x: auto;
+}
+
+.feedback-actions {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-top: 1.5rem;
+}
+
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem 2rem;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  text-decoration: none;
+  color: var(--texto);
+  background: var(--surface);
+  font-weight: 700;
+}
+
+.btn-secondary:hover {
+  background: var(--bg);
+}
+
+.admin-heading,
+.search-form,
+.admin-summary {
+  margin-top: 1.5rem;
+}
+
+.admin-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.admin-actions {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.search-form label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 0.6rem;
+}
+
+.search-row {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.search-row input {
+  flex: 1;
+  min-width: 200px;
+}
+
+.admin-summary {
+  display: inline-flex;
+  gap: 0.5rem;
+  align-items: center;
+  padding: 1rem 1.2rem;
+  background: var(--surface-2);
+  border-radius: 16px;
+  color: var(--texto);
+}
+
+.admin-table-wrapper {
+  overflow-x: auto;
+  margin-top: 1rem;
+}
+
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 900px;
+}
+
+.admin-table th,
+.admin-table td {
+  padding: 0.9rem 1rem;
+  border: 1px solid var(--border);
+  text-align: left;
+  vertical-align: top;
+}
+
+.admin-table th {
+  background: var(--bg);
+  font-weight: 700;
+}
+
+.break-word {
+  word-break: break-word;
+}
+
+/* =========================
+   HERO
+========================= */
+.hero {
+  position: relative;
+  min-height: 80vh;
+  background: linear-gradient(
+    135deg,
+    #1e2a78 0%,
+    #2f5bea 35%,
+    #6a2fe8 65%,
+    #c026d3 100%
+  );
+
+  display: flex;
+  align-items:stretch;
+  overflow: hidden;
+  padding-top: 0rem;
+}
+
+.hero-container {
+  flex: 1;
+  max-width: 1300px;
+  margin: auto;
+  padding:1rem 2rem 4rem;
+
+  display: grid;
+  grid-template-columns: 1.25fr 0.75fr;
+  align-items: center;
+  gap: 3rem;
+
+  position: relative;
+  z-index: 2;
+}
+
+/* =========================
+   HERO VISUAL
+========================= */
+.hero-visual {
+  position: relative;
+  display: flex;
+  justify-content: center;
+}
+
+.hero-visual img {
+  width: 100%;
+  max-width: 1000px;
+  transform: scale(1.2);
+  position: relative;
+  z-index: 2;
+}
+
+/* GLOW */
+.hero-visual::before,
+.hero-visual::after {
+  content: "";
+  position: absolute;
+  top:50%;
+  left:50%;
+  width: 320px;
+  height: 320px;
+  border-radius: 50%;
+  filter: blur(90px);
+  transform: translate(-50%, -50%);
+  z-index: 1;
+}
+
+/* Azul claro (topo) */
+.hero-visual::before {
+  background: rgba(125, 211, 252, 0.45);
+  transform: translate(-50%, -60%);
+}
+
+/* Laranja/rosa (baixo) */
+.hero-visual::after {
+  background: rgba(251, 146, 60, 0.55);
+  transform: translate(-50%, -60%);
+}
+
+/* =========================
+   HERO TEXTO
+========================= */
+.hero-texto {
+  color: #ffffff;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
+.hero-texto h1 {
+  
+  font-weight: 700;
+  font-size: 3.4rem;
+  margin-bottom: 1.8rem;
+  
+  
+}
+
+
+.hero-sub {
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.hero-texto p {
+  font-size: 1.2rem;
+  max-width: 480px;
+  margin-bottom: 2.5rem;
+  line-height: 1.6;
+}
+
+/* BOTÃO */
+.btn-hero {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 1rem 2.6rem;
+  border-radius: 999px;
+
+  font-size: 1.1rem;
+  font-weight: 800;
+  text-decoration: none;
+  color: #1f2933; /* sempre escuro: assenta sobre gradiente amarelo nos 2 temas */
+
+  background: linear-gradient(
+    90deg,
+    #fde047,
+    #fb923c,
+    #facc15
+  );
+
+  box-shadow:
+    0 8px 20px rgba(251, 191, 36, 0.45),
+    0 0 0 0 rgba(251, 191, 36, 0.6);
+
+  transition:
+    transform 0.25s ease,
+    box-shadow 0.25s ease;
+}
+
+.btn-hero::after {
+  content: "";
+  position: absolute;
+  inset: -6px;
+  border-radius: inherit;
+
+  background: linear-gradient(
+    90deg,
+    rgba(253, 224, 71, 0.6),
+    rgba(251, 146, 60, 0.6),
+    rgba(250, 204, 21, 0.6)
+  );
+
+  filter: blur(14px);
+  opacity: 0.7;
+  z-index: -1;
+
+  animation: pulse 3.5s ease-in-out infinite;
+}
+@keyframes pulse {
+  0%, 100% {
+    opacity: 0.4;
+  }
+  50% {
+    opacity: 0.9;
+  }
+}
+
+
+.btn-hero:hover {
+  transform: translateY(-3px) scale(1.03);
+
+  box-shadow:
+    0 14px 30px rgba(251, 191, 36, 0.6),
+    0 0 0 0 rgba(251, 191, 36, 0.9);
+}
+
+
+.hero-cta {
+  margin-top: clamp(2rem, 6vh, 4rem);
+  display: flex;
+  justify-content: center;
+}
+
+/* =========================
+   ONDA
+========================= */
+.hero-wave {
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  width: 100%;
+  height: 160px;
+  z-index: 1;
+}
+
+.hero-wave svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* A onda acompanha o fundo do tema (sobrepõe o fill inline do SVG) */
+.hero-wave path {
+  fill: var(--bg);
+}
+
+/* =========================
+   BOTÃO DE TEMA (claro/escuro)
+========================= */
+nav .theme-toggle {
+  border: 1.5px solid var(--border);
+  background: var(--surface);
+  color: var(--texto);
+  width: 2.2rem;
+  height: 2.2rem;
+  border-radius: 50%;
+  font-size: 1rem;
+  line-height: 1;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: border-color 0.2s ease, transform 0.2s ease;
+}
+
+nav .theme-toggle:hover {
+  border-color: var(--roxo);
+  transform: rotate(15deg);
+}
+
+/* =========================
+   FOOTER
+========================= */
+footer {
+  background: var(--fundo-claro);
+  text-align: center;
+  padding: 1.5rem 1rem;
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
+
+.footer-license {
+  margin-top: 0.4rem;
+  font-size: 0.8rem;
+}
+
+.footer-license a {
+  color: var(--text-muted);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.footer-license a:hover {
+  color: var(--accent);
+}
+
+/* =========================
+   RESPONSIVO
+========================= */
+@media (max-width: 900px) {
+
+  /* =========================
+     HEADER
+  ========================= */
+  header {
+    position: static;
+  }
+
+  .header-container {
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  nav {
+    width: 100%;
+  }
+
+  nav ul {
+    display: flex;
+    justify-content: center;
+    gap: 1.2rem;
+    flex-wrap: wrap;
+  }
+
+  /* =========================
+     HERO
+  ========================= */
+  .hero {
+    padding-top: 1.5rem;
+  }
+
+  .hero-container {
+    display: flex;              /* 🔑 força layout vertical */
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding-top: 1.5rem;
+    padding-bottom: 2rem;
+  }
+
+  .hero-visual {
+    order: -1;
+    margin-bottom: 2rem;
+  }
+
+  .hero-visual img {
+    max-width: 420px;
+  }
+
+  .hero-texto {
+    align-items: center;
+    text-align: center;
+  }
+
+  .hero-texto h1 {
+    font-size: clamp(2rem, 5vw, 2.4rem);
+    margin-bottom: 0.9rem;
+  }
+
+  .hero-texto p {
+  font-size: 1.05rem;
+  margin-bottom: 1.3rem;
+  line-height: 1.5;
+}
+
+
+  .hero-cta {
+    margin-top: 1.2rem;
+    justify-content: center;
+  }
+
+  .hero-wave {
+    height: 120px;
+  }
+
+}
+
+/* =========================
+   PÁGINAS INTERNAS
+========================= */
+
+.pagina {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 3rem 2rem 4rem;
+}
+
+.pagina-header {
+  margin-bottom: 3rem;
+  text-align: center;
+}
+
+.pagina-header h1 {
+  font-size: 2.6rem;
+  font-weight: 800;
+  margin-bottom: 1rem;
+}
+
+.pagina-sub {
+  font-size: 1.2rem;
+  color: var(--text-muted);
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+/* Conteúdo */
+.pagina-conteudo {
+  font-size: 1.05rem;
+  line-height: 1.7;
+}
+
+/* O reset do topo zera a margem de tudo; aqui ela volta para o parágrafo. */
+.pagina-conteudo p {
+  margin: 0 0 1.15rem;
+}
+
+/* Títulos internos */
+.pagina-conteudo h2 {
+  font-size: 1.8rem;
+  margin: 3rem 0 1.2rem;
+}
+
+.pagina-conteudo h3 {
+  font-size: 1.4rem;
+  margin: 2.2rem 0 1rem;
+}
+
+/* Listas */
+.pagina-conteudo ul {
+  padding-left: 1.5rem;
+  margin: 1.2rem 0;
+}
+
+.pagina-conteudo li {
+  margin-bottom: 0.6rem;
+}
+
+/* Destaques */
+.pagina-conteudo strong {
+  color: var(--roxo);
+}
+
+/* =========================
+   TABELAS
+========================= */
+
+.tabela {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 2.5rem 0;
+  font-size: 1rem;
+  background: var(--surface);
+  border-radius: 12px;
+  overflow: hidden; /* necessário para borda arredondada */
+  box-shadow: 0 8px 24px var(--shadow);
+}
+
+/* Cabeçalho */
+.tabela thead {
+  background: linear-gradient(
+    90deg,
+    var(--azul),
+    var(--roxo)
+  );
+}
+
+.tabela thead th {
+  color: #ffffff;
+  font-weight: 700;
+  text-align: left;
+  padding: 1rem 1.2rem;
+  font-size: 0.95rem;
+  letter-spacing: 0.3px;
+}
+
+/* Corpo */
+.tabela tbody td {
+  padding: 0.9rem 1.2rem;
+  border-bottom: 1px solid var(--border);
+}
+
+/* Zebra */
+.tabela tbody tr:nth-child(even) {
+  background: var(--bg);
+}
+
+/* Última linha sem borda */
+.tabela tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* Coluna símbolo mais compacta */
+.tabela td:last-child,
+.tabela th:last-child {
+  text-align: center;
+  width: 80px;
+  font-weight: 600;
+}
+
+/* =========================
+   LISTAS – PADRÕES
+========================= */
+
+/* =========================
+   LISTAS – PADRÃO (NUMÉRICA)
+========================= */
+
+/* Remove estilo padrão */
+.pagina-conteudo ul {
+  list-style: none;
+  counter-reset: item;
+  padding-left: 0;
+  margin: 1.4rem 0;
+}
+
+.pagina-conteudo ul li {
+  counter-increment: item;
+  position: relative;
+  padding-left: 2.2rem;
+  margin-bottom: 0.7rem;
+  line-height: 1.6;
+}
+
+.pagina-conteudo ul li::before {
+  content: counter(item) ".";
+  position: absolute;
+  left: 0;
+  top: 0;
+  font-weight: 700;
+  color: var(--roxo);
+}
+
+
+.lista-alfabetica {
+  counter-reset: item;
+}
+
+.lista-alfabetica li {
+  counter-increment: item;
+  padding-left: 2.2rem;
+  position: relative;
+}
+
+.lista-alfabetica li::before {
+  content: counter(item, lower-alpha) ")";
+  position: absolute;
+  left: 0;
+  top: 0;
+  font-weight: 700;
+  color: var(--azul);
+}
+
+.lista-romana {
+  counter-reset: item;
+}
+
+.lista-romana li {
+  counter-increment: item;
+  padding-left: 2.6rem;
+  position: relative;
+}
+
+.lista-romana li::before {
+  content: counter(item, upper-roman) ".";
+  position: absolute;
+  left: 0;
+  top: 0;
+  font-weight: 700;
+  color: var(--azul-escuro);
+}
+
+/* =========================
+   RESPONSIVO PÁGINAS
+========================= */
+@media (max-width: 600px) {
+
+  .pagina {
+    padding: 2rem 1.5rem 3rem;
+  }
+
+  .pagina-header h1 {
+    font-size: 2.2rem;
+  }
+
+}
+
+/* =========================
+   CONTEÚDOS – GRID (legado)
+========================= */
+
+.conteudos-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1.8rem;
+}
+
+.conteudo-card {
+  background: var(--surface);
+  border-radius: 18px;
+  padding: 1.8rem 1.6rem;
+  text-decoration: none;
+  color: var(--texto);
+  box-shadow: 0 10px 28px var(--shadow);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.conteudo-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 18px 40px var(--shadow-forte);
+}
+
+.conteudo-card .icone {
+  font-size: 2rem;
+  display: inline-block;
+  margin-bottom: 0.8rem;
+}
+
+.conteudo-card h3 {
+  font-size: 1.25rem;
+  margin-bottom: 0.6rem;
+  font-weight: 700;
+}
+
+.conteudo-card p {
+  font-size: 0.95rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+
+/* =========================
+   PROGRAMAS – PÁGINA
+========================= */
+
+.pagina-programas {
+  max-width: 1100px;
+}
+
+/* Filtros */
+.filtros-programas {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-bottom: 2rem;
+}
+
+.filtro-btn {
+  padding: 0.4rem 1.1rem;
+  border-radius: 999px;
+  border: 1.5px solid var(--border);
+  background: var(--surface);
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  color: var(--text-muted);
+  font-family: inherit;
+  transition: border-color 0.2s ease, color 0.2s ease, background 0.2s ease;
+}
+
+.filtro-btn:hover {
+  border-color: var(--roxo);
+  color: var(--roxo);
+}
+
+.filtro-btn.ativo {
+  background: linear-gradient(90deg, var(--azul), var(--roxo));
+  color: #fff;
+  border-color: transparent;
+}
+
+/* Grid de programas */
+.programas-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+}
+
+/* Card compacto */
+.programa-card {
+  background: var(--surface);
+  border-radius: 14px;
+  padding: 1rem 1.1rem;
+  text-decoration: none;
+  color: var(--texto);
+  border: 1.5px solid var(--border);
+  box-shadow: 0 2px 10px var(--shadow);
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.programa-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 28px rgba(47,91,234,0.12);
+  border-color: var(--azul);
+}
+
+.programa-card-topo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.65rem;
+}
+
+.programa-card .icone {
+  font-size: 1.6rem;
+}
+
+.programa-card h3 {
+  font-size: 0.97rem;
+  font-weight: 700;
+  margin-bottom: 0.3rem;
+  line-height: 1.3;
+}
+
+.programa-card p {
+  font-size: 0.83rem;
+  color: var(--text-muted);
+  line-height: 1.45;
+  margin-top: auto;
+}
+
+/* Badges de categoria */
+.categoria-badge {
+  font-size: 0.68rem;
+  font-weight: 700;
+  padding: 0.18rem 0.55rem;
+  border-radius: 999px;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.categoria-badge.fisica {
+  background: rgba(47, 91, 234, 0.1);
+  color: var(--azul);
+}
+
+.categoria-badge.graficos {
+  background: rgba(106, 47, 232, 0.1);
+  color: var(--roxo);
+}
+
+.categoria-badge.ferramentas {
+  background: rgba(251, 146, 60, 0.12);
+  color: #c2550a;
+}
+
+.categoria-badge.jogos {
+  background: rgba(34, 197, 94, 0.12);
+  color: #16a34a;
+}
+
+@media (max-width: 900px) {
+  .programas-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 600px) {
+  .programas-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+  }
+
+  .pagina-programas .pagina-header h1 {
+    font-size: 2rem;
+  }
+}
+
+/* =========================
+   ATIVIDADES – ED CARDS
+========================= */
+
+.atividades-main {
+  background: var(--fundo-claro);
+  padding: 2rem 0 3rem;
+}
+
+.atividades-container {
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 2rem 2rem 1rem;
+}
+
+.atividades-container h1 {
+  font-size: 2.2rem;
+  font-weight: 800;
+  margin-bottom: 0.4rem;
+  color: var(--texto);
+}
+
+.atividades-intro {
+  font-size: 1rem;
+  color: var(--text-muted);
+  margin-bottom: 1.8rem;
+}
+
+/* Grid 3 × 2 */
+.ed-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.1rem;
+}
+
+/* Card */
+.ed-card {
+  text-decoration: none;
+  color: var(--texto);
+  border-radius: 14px;
+  overflow: hidden;
+  border: 1.5px solid var(--border);
+  box-shadow: 0 4px 14px var(--shadow);
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease;
+}
+
+.ed-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 14px 36px rgba(47, 91, 234, 0.15);
+  border-color: var(--roxo);
+}
+
+/* Preview (hero thumbnail) */
+.ed-preview {
+  position: relative;
+  height: 150px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+/* Subtle grid lines for dark cards */
+.ed-grid-lines {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.045) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.045) 1px, transparent 1px);
+  background-size: 22px 22px;
+  pointer-events: none;
+}
+
+.ed-preview-content {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 1rem;
+  text-align: center;
+}
+
+/* Year badge */
+.ed-badge {
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  padding: 0.16rem 0.65rem;
+  border-radius: 999px;
+  border: 1px solid;
+}
+
+/* Formula */
+.ed-formula {
+  font-family: var(--font-mono);
+  font-size: 0.88rem;
+  line-height: 1.75;
+  display: block;
+  text-align: center;
+}
+
+/* Energia card tags */
+.ed-energy-tags {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  font-size: 0.72rem;
+  font-weight: 600;
+}
+
+.ed-energy-tags span {
+  padding: 0.22rem 0.75rem;
+  border-radius: 6px;
+}
+
+/* Footer strip */
+.ed-footer {
+  background: var(--surface);
+  padding: 0.8rem 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-top: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.ed-footer-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.ed-topic {
+  font-size: 0.65rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.ed-title {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--texto);
+  line-height: 1.3;
+}
+
+.ed-arrow {
+  color: var(--laranja);
+  font-weight: 800;
+  font-size: 1rem;
+  transition: transform 0.25s ease;
+  flex-shrink: 0;
+}
+
+.ed-card:hover .ed-arrow {
+  transform: translateX(5px);
+}
+
+/* Agrupamento por grande área */
+.ed-area {
+  margin-bottom: 2.6rem;
+}
+
+.ed-area-head {
+  display: flex;
+  align-items: baseline;
+  gap: 0.7rem;
+  padding-bottom: 0.55rem;
+  margin-bottom: 1.1rem;
+  border-bottom: 2px solid color-mix(in srgb, var(--tema-cor, var(--azul)) 30%, transparent);
+}
+
+.ed-area-head h2 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--tema-strong, var(--titulo));
+  margin: 0;
+}
+
+.ed-area-head a {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--tema-cor, var(--azul));
+  text-decoration: none;
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
+.ed-area-head a:hover {
+  text-decoration: underline;
+}
+
+@media (max-width: 720px) {
+  .ed-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 480px) {
+  .ed-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .atividades-container h1 {
+    font-size: 1.8rem;
+  }
+}
+
+/* ===== HUB DE ATIVIDADES (2 cards grandes) ===== */
+.hub-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  max-width: 680px;
+  margin: 0 auto;
+}
+
+.hub-card {
+  text-decoration: none;
+  color: var(--texto);
+  border-radius: 16px;
+  overflow: hidden;
+  border: 1.5px solid var(--border);
+  box-shadow: 0 4px 18px var(--shadow);
+  display: flex;
+  flex-direction: column;
+  transition: transform .22s ease, box-shadow .22s ease, border-color .22s ease;
+}
+
+.hub-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 16px 40px rgba(47,91,234,.18);
+  border-color: var(--roxo);
+}
+
+.hub-preview {
+  height: 200px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.hub-icon-area {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: .7rem;
+  text-align: center;
+  padding: 1.2rem;
+}
+
+.hub-formulas {
+  font-family: var(--font-mono);
+  font-size: .82rem;
+  line-height: 2;
+  display: block;
+  text-align: center;
+}
+
+.hub-card-footer {
+  background: var(--surface);
+  padding: 1rem 1.2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-top: 1px solid var(--border);
+  flex: 1;
+}
+
+.hub-card-text {
+  display: flex;
+  flex-direction: column;
+  gap: .2rem;
+}
+
+.hub-card-label {
+  font-size: .65rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: .5px;
+}
+
+.hub-card-title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--texto);
+  line-height: 1.2;
+}
+
+.hub-card-desc {
+  font-size: .8rem;
+  color: var(--text-muted);
+  margin-top: .15rem;
+  line-height: 1.4;
+}
+
+.hub-arrow {
+  color: var(--laranja);
+  font-weight: 800;
+  font-size: 1.2rem;
+  transition: transform .25s ease;
+  flex-shrink: 0;
+}
+
+.hub-card:hover .hub-arrow { transform: translateX(5px); }
+
+/* Breadcrumb de volta */
+.atividades-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: .85rem;
+  font-weight: 600;
+  color: var(--azul);
+  text-decoration: none;
+  margin-bottom: 1.4rem;
+  transition: color .2s;
+}
+.atividades-back:hover { color: var(--roxo); }
+
+@media (max-width: 560px) {
+  .hub-grid { grid-template-columns: 1fr; }
+}
+
+/* ============================= */
+.pagina-larga {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 3rem 2rem 4rem;
+}
+
+/* ======== ESTILO DO GERADOR DE GRÁFICOS ======== */
+
+.app-container {
+  max-width: 1200px;
+  margin: 0 auto;   /* centraliza horizontalmente */
+  text-align: center;
+}
+
+
+.app-card {
+  background: var(--surface);
+  padding: 25px;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px var(--shadow);
+}
+
+.linha-inputs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  align-items: end;
+}
+
+.campo {
+  display: flex;
+  flex-direction: column;
+}
+
+.campo input {
+  padding: 8px 10px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  min-width: 150px;
+}
+
+.botao-principal {
+  padding: 10px 18px;
+  border: none;
+  border-radius: 6px;
+  background-color: #1e88e5;
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.botao-principal:hover {
+  background-color: #1565c0;
+}
+
+.dica {
+  margin-top: 15px;
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
+
+.area-grafico {
+  margin-top: 30px;
+  background: var(--surface);
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px var(--shadow);
+}
+
+
+
+/* ===== Ajuste da seção destaque para aplicativos ===== */
+
+.destaque {
+  background: linear-gradient(135deg, #1e88e5, #1565c0);
+  color: white;
+  padding: 40px 20px;
+  border-radius: 12px;
+  margin-bottom: 30px;
+}
+
+.destaque h2 {
+  margin: 0 0 10px 0;
+  font-size: 1.8rem;
+}
+
+.destaque p {
+  margin: 0;
+  opacity: 0.95;
+}
+
+.botao-secundario {
+  padding: 10px 18px;
+  border: none;
+  border-radius: 6px;
+  background-color: var(--text-muted);
+  color: white;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.botao-secundario:hover {
+  background-color: #333;
+}
+
+/* Padronizar SELECT igual aos inputs */
+
+.campo select {
+  padding: 8px 10px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  min-width: 170px;
+  font-size: 0.95rem;
+  background-color: var(--surface);
+  cursor: pointer;
+}
+
+.campo select:focus,
+.campo input:focus {
+  outline: none;
+  border-color: #1e88e5;
+  box-shadow: 0 0 0 2px rgba(30,136,229,0.2);
+}
+
+#graficoCanvas {
+  display: block;
+  margin: 0 auto;
+}
+
+/* =========================
+   REFERÊNCIAS BIBLIOGRÁFICAS
+   Padrão do site: indicador numérico sobrescrito no corpo do texto,
+   clicável, levando à lista ao final da página, com link de retorno.
+   Uso:
+     <sup class="ref"><a href="#ref-1" id="cite-1">1</a></sup>
+     <section class="content-section referencias" id="referencias"> … </section>
+========================= */
+.ref {
+  font-size: 0.7em;
+  line-height: 0;
+  vertical-align: super;
+  font-weight: 700;
+  margin-left: 1px;
+}
+
+.ref a {
+  color: var(--tema-cor, var(--azul));
+  text-decoration: none;
+  padding: 0 2px;
+  border-radius: 3px;
+  transition: background 0.15s, color 0.15s;
+}
+
+.ref a:hover,
+.ref a:focus-visible {
+  background: color-mix(in srgb, var(--tema-cor, var(--azul)) 14%, transparent);
+  text-decoration: none;
+}
+
+/* Lista de referências ao final do texto */
+.referencias {
+  border-top: 2px solid var(--border);
+  padding-top: 1.5rem;
+}
+
+.referencias ol {
+  padding-left: 1.4rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+}
+
+.referencias li {
+  font-size: 0.88rem;
+  line-height: 1.65;
+  color: var(--text-muted);
+}
+
+.referencias li::marker { color: var(--tema-cor, var(--azul)); font-weight: 700; }
+
+/* Destaque temporário ao chegar numa referência pelo indicador */
+.referencias li:target {
+  background: color-mix(in srgb, var(--tema-cor, var(--azul)) 9%, transparent);
+  border-radius: 6px;
+  box-shadow: 0 0 0 6px color-mix(in srgb, var(--tema-cor, var(--azul)) 9%, transparent);
+}
+
+.referencias .voltar {
+  color: var(--tema-cor, var(--azul));
+  text-decoration: none;
+  margin-left: 0.35rem;
+  font-size: 0.95rem;
+}
+
+.referencias .voltar:hover { text-decoration: underline; }
+
+/* =========================
+   PÁGINA SOBRE (sobre.html)
+   Componentes só desta página. Ficam aqui, e não num <style> na página,
+   pela mesma razão das listas: folha única por tipo de página.
+========================= */
+
+.sobre-abertura {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--roxo);
+  border-radius: 14px;
+  padding: 1.6rem 1.8rem;
+  margin: 2rem 0 0;
+  font-size: 1.08rem;
+  line-height: 1.7;
+}
+
+.sobre-divisao {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.2rem;
+  margin: 1.8rem 0;
+}
+
+.sobre-coluna {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 1.5rem 1.6rem;
+}
+
+.sobre-coluna.maquina { border-top: 4px solid var(--azul); }
+.sobre-coluna.humano  { border-top: 4px solid var(--roxo); }
+
+.sobre-coluna h3 {
+  font-size: 1.15rem;
+  margin: 0 0 0.9rem;
+  color: var(--titulo);
+}
+
+.pagina-conteudo .sobre-coluna ul {
+  list-style: none;
+  counter-reset: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+}
+
+.pagina-conteudo .sobre-coluna ul li {
+  counter-increment: none;
+  margin: 0;
+  padding-left: 1.4rem;
+  position: relative;
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+/* Os itens não têm ordem entre si: a marca é um ponto, não um número. */
+.pagina-conteudo .sobre-coluna ul li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.62em;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--border);
+}
+
+.pagina-conteudo .sobre-coluna.maquina ul li::before { background: var(--azul); }
+.pagina-conteudo .sobre-coluna.humano  ul li::before { background: var(--roxo); }
+
+.sobre-nota {
+  background: var(--info-bg);
+  border: 1px solid var(--info-border);
+  border-radius: 14px;
+  padding: 1.4rem 1.6rem;
+  margin: 1.8rem 0;
+  font-size: 1.03rem;
+  line-height: 1.7;
+  color: var(--info-text);
+}
+
+.sobre-nota strong { color: inherit; }
+
+.sobre-contato {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.8rem;
+  margin-top: 1.4rem;
+}
+
+.sobre-contato a,
+.sobre-contato button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.7rem 1.2rem;
+  border-radius: 10px;
+  border: 1.5px solid var(--border);
+  background: var(--surface);
+  color: var(--texto);
+  font-family: inherit;
+  font-size: 0.98rem;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  transition: border-color .2s, background .2s;
+}
+
+.sobre-contato a:hover,
+.sobre-contato button:hover {
+  border-color: var(--azul);
+  background: var(--info-bg);
+}
+
+@media (max-width: 600px) {
+  .sobre-abertura, .sobre-coluna, .sobre-nota { padding: 1.2rem 1.3rem; }
+}
+
+/* =========================
+   TEXTOS EM REVISÃO
+   Estado de um texto de conteudos/ que ainda não passou por revisão humana
+   e por isso está fora do ar. Três lugares: o selo do card do tema em
+   conteudos.html, o item desativado no hub do tema e a página que ocupa a
+   URL pública do texto. Aplicado por scripts/aplicar-revisao.ps1.
+========================= */
+
+/* Selo do card do tema (conteudos.html) */
+.conteudo-card .card-selo {
+  display: inline-block;
+  margin-top: 0.9rem;
+  padding: 0.25rem 0.7rem;
+  border-radius: 999px;
+  background: var(--warn-bg);
+  border: 1px solid var(--warn-border);
+  color: var(--warn-text);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+
+/* Item desativado no hub do tema.
+   Os hubs carregam esta folha ANTES do próprio <style> inline, então as regras
+   abaixo precisam de especificidade maior que a de lá para vencer. Daí o
+   seletor com o pai .subtopicos-lista, e não .sub-espera sozinho. */
+.subtopicos-lista .sub-link.sub-espera {
+  background: var(--surface-2);
+  border-style: dashed;
+  border-color: var(--border);
+  box-shadow: none;
+  cursor: default;
+  opacity: 0.75;
+}
+
+.subtopicos-lista .sub-link.sub-espera:hover {
+  border-color: var(--border);
+  box-shadow: none;
+  transform: none;
+}
+
+.subtopicos-lista .sub-espera .sub-num {
+  background: var(--border);
+  color: var(--text-muted);
+}
+
+.subtopicos-lista .sub-espera .sub-info h3 {
+  color: var(--text-muted);
+}
+
+.sub-selo {
+  flex-shrink: 0;
+  padding: 0.28rem 0.7rem;
+  border-radius: 999px;
+  background: var(--warn-bg);
+  border: 1px solid var(--warn-border);
+  color: var(--warn-text);
+  font-size: 0.76rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+/* Página que ocupa a URL pública enquanto o texto está fora do ar */
+.pagina-revisao {
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 4rem 1.5rem 5rem;
+  text-align: center;
+}
+
+.pagina-revisao .revisao-icone {
+  font-size: 2.6rem;
+  display: block;
+  margin-bottom: 1.2rem;
+}
+
+.pagina-revisao h1 {
+  font-size: clamp(1.5rem, 4vw, 2rem);
+  color: var(--titulo);
+  margin-bottom: 0.5rem;
+}
+
+.pagina-revisao .revisao-tema {
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  margin-bottom: 0.8rem;
+}
+
+.pagina-revisao .revisao-texto {
+  background: var(--warn-bg);
+  border: 1px solid var(--warn-border);
+  color: var(--warn-text);
+  border-radius: 14px;
+  padding: 1.4rem 1.6rem;
+  margin: 1.8rem 0;
+  font-size: 1.02rem;
+  line-height: 1.7;
+  text-align: left;
+}
+
+/* O reset do topo zera a margem de tudo; aqui ela volta para o parágrafo. */
+.pagina-revisao .revisao-texto p + p { margin-top: 0.9rem; }
+
+.pagina-revisao .revisao-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.8rem;
+  justify-content: center;
+}
+
+.pagina-revisao .revisao-links a {
+  padding: 0.7rem 1.2rem;
+  border-radius: 10px;
+  border: 1.5px solid var(--border);
+  background: var(--surface);
+  color: var(--texto);
+  font-weight: 600;
+  font-size: 0.98rem;
+  text-decoration: none;
+  transition: border-color .2s, background .2s;
+}
+
+.pagina-revisao .revisao-links a:hover {
+  border-color: var(--azul);
+  background: var(--info-bg);
+}
