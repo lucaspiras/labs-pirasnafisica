@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="/js/theme.js"></script>
+  <link rel="icon" type="image/png" sizes="32x32" href="/img/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/img/icons/favicon-16.png">
+  <link rel="apple-touch-icon" href="/img/icons/apple-touch-icon.png">
+  <meta name="description" content="Lançamento horizontal em 3D: uma esfera desce a rampa sobre a mesa, a fotoporta mede a velocidade de saída e a marca no papel mostra onde ela cai. Preveja o alcance e confira.">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Lançamento horizontal — Laboratório — Piras na Física">
+  <meta property="og:description" content="Rampa sobre a mesa, fotoporta e papel no chão: prever onde a esfera cai.">
+  <meta property="og:image" content="https://pirasnafisica.com.br/img/og-logo.jpg">
+  <meta property="og:locale" content="pt_BR">
+  <meta property="og:url" content="https://labs.pirasnafisica.com.br/experimentos/lancamento-horizontal/">
+  <title>Lançamento horizontal — Piras na Física</title>
+
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-TY56KM22X8"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-TY56KM22X8');
+  </script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600;700&family=Playfair+Display:wght@700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../motor/estilo.css">
+
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "/experimentos/vendor/three/three.module.min.js",
+      "three/addons/": "/experimentos/vendor/three/addons/"
+    }
+  }
+  </script>
+</head>
+<body>
+
+<header class="site-header">
+  <a href="https://pirasnafisica.com.br/" class="logo-link">
+    <img src="/img/novo_logo_final.png" alt="Piras na Física" class="logo-img">
+    <div class="logo-text">
+      Lançamento horizontal
+      <span>Laboratório · Piras na Física</span>
+    </div>
+  </a>
+  <div class="header-badges">
+    <a class="header-badge opcional" href="/experimentos/">← Experimentos</a>
+    <button class="header-badge" type="button" onclick="FeedbackModal.open()">💬 Sua opinião</button>
+    <button class="header-badge" type="button" id="theme-toggle" aria-label="Alternar tema claro e escuro">🌙</button>
+  </div>
+</header>
+
+<main class="exp">
+
+  <!-- ═══ CENA 3D ═══ -->
+  <section class="exp-cena" id="cena" aria-label="Rampa sobre a mesa e papel no chão, em três dimensões. Arraste para girar a vista.">
+    <div class="exp-barra topo">
+      <div class="grupo-bt" role="group" aria-label="Vistas">
+        <button class="bt-cena" type="button" data-vista="inicial">Inicial</button>
+        <button class="bt-cena" type="button" data-vista="lado">Lado</button>
+        <button class="bt-cena" type="button" data-vista="rampa">Rampa</button>
+        <button class="bt-cena" type="button" data-vista="fotoporta">Fotoporta</button>
+        <button class="bt-cena" type="button" data-vista="papel">Papel</button>
+      </div>
+      <div class="grupo-bt" role="group" aria-label="Tempo da simulação">
+        <button class="bt-cena" type="button" id="bt-pausa" aria-pressed="false">⏸ Pausar</button>
+        <button class="bt-cena" type="button" id="bt-velocidade" title="Velocidade da simulação">1×</button>
+      </div>
+    </div>
+
+    <div class="exp-barra base">
+      <button class="bt-cena principal" type="button" id="bt-soltar">Soltar a esfera</button>
+    </div>
+
+    <p class="exp-dica">
+      Clique no corpo para soltá-lo. Cada queda deixa uma marca no papel: um ponto da esfera, um
+      risco do cilindro. O botão "Papel" mostra as marcas de cima.
+    </p>
+  </section>
+
+  <!-- ═══ PAINEL ═══ -->
+  <aside class="exp-painel" id="painel">
+    <nav class="exp-abas" role="tablist">
+      <button type="button" role="tab" data-aba="montagem">Montagem</button>
+      <button type="button" role="tab" data-aba="medidas">Medidas</button>
+      <button type="button" role="tab" data-aba="roteiro">Roteiro</button>
+    </nav>
+
+    <div class="exp-conteudo">
+
+      <!-- Montagem -->
+      <div data-painel="montagem">
+        <div class="secao">
+          <h3>Rampa</h3>
+          <div id="ctl-montagem"></div>
+        </div>
+        <div class="secao">
+          <h3>Leituras da montagem</h3>
+          <dl class="leitura">
+            <dt>Altura de soltura h (régua)</dt><dd id="lei-h">—</dd>
+            <dt>Altura H da saída ao chão (trena)</dt><dd id="lei-H">—</dd>
+            <dt>Diâmetro (paquímetro)</dt><dd id="lei-diam">—</dd>
+            <dt>Massa (balança)</dt><dd id="lei-massa">—</dd>
+          </dl>
+        </div>
+        <div class="secao">
+          <h3>Previsão</h3>
+          <label class="campo-num">Alcance previsto d (m)
+            <input type="text" id="d-prev" inputmode="decimal" placeholder="0,000" style="width:90px">
+          </label>
+          <div class="linha-bts">
+            <button class="bt cheio" type="button" id="bt-alvo">Pôr o alvo no papel</button>
+            <button class="bt" type="button" id="bt-tirar-alvo">Tirar o alvo</button>
+            <button class="bt" type="button" id="bt-papel">Trocar o papel</button>
+          </div>
+        </div>
+        <div class="secao">
+          <h3>Simulação</h3>
+          <div id="ctl-simulacao"></div>
+          <dl class="leitura" id="lei-modelo" hidden>
+            <dt>Velocidade de saída prevista</dt><dd id="lei-vmodelo">—</dd>
+            <dt>Alcance previsto, sem o ar</dt><dd id="lei-Dmodelo">—</dd>
+          </dl>
+        </div>
+      </div>
+
+      <!-- Medidas -->
+      <div data-painel="medidas" hidden>
+        <div class="secao">
+          <h3>Último lançamento</h3>
+          <dl class="leitura">
+            <dt>Tempo de bloqueio da fotoporta</dt><dd id="lei-dt">—</dd>
+            <dt>Alcance d (prumo até a marca, trena)</dt><dd id="lei-D">—</dd>
+          </dl>
+          <div class="linha-bts">
+            <button class="bt cheio" type="button" id="bt-registrar">Registrar na tabela</button>
+          </div>
+        </div>
+
+        <div class="secao">
+          <h3>Tabela</h3>
+          <div id="tabela"></div>
+          <div class="linha-bts">
+            <button class="bt" type="button" id="bt-csv">Baixar CSV</button>
+            <button class="bt" type="button" id="bt-limpar">Limpar tabela</button>
+          </div>
+        </div>
+
+        <div class="secao">
+          <h3 class="simb">d em função de v</h3>
+          <div id="grafico-d"></div>
+          <p class="resultado-ajuste" id="ajuste-d">Registre ao menos dois lançamentos de alturas diferentes para ver a reta.</p>
+        </div>
+
+        <div class="secao">
+          <h3 class="simb" id="titulo-grafico-v">v² em função de h</h3>
+          <div id="grafico-v"></div>
+          <p class="resultado-ajuste" id="ajuste-v">Este gráfico aparece com dois lançamentos ou mais.</p>
+        </div>
+      </div>
+
+      <!-- Roteiro -->
+      <div data-painel="roteiro" hidden>
+        <article class="roteiro">
+          <h2>Lançamento horizontal</h2>
+
+          <p>
+            Uma esfera desce uma rampa sobre a mesa, sai pela borda na horizontal e cai no chão, onde
+            deixa uma marca num papel. O desafio deste experimento é dizer, antes de soltar, onde
+            essa marca vai aparecer. Para isso você vai medir a velocidade com que a esfera sai da
+            rampa e a altura da mesa, e vai juntar as duas coisas num modelo simples.
+          </p>
+
+          <h3>1. O modelo</h3>
+          <p>
+            A partir do momento em que deixa a rampa, a esfera faz dois movimentos ao mesmo tempo e
+            independentes. Na horizontal, nada a empurra nem a freia, e ela segue com a velocidade v
+            de saída. Na vertical, cai como se tivesse sido solta do repouso da altura H. O tempo de
+            queda depende só da altura:
+          </p>
+          <p class="formula">t<sub>q</sub> = √(2 · H / g)</p>
+          <p>
+            Durante esse tempo, a esfera anda na horizontal o <b>alcance</b> d:
+          </p>
+          <p class="formula">d = v · t<sub>q</sub></p>
+          <p>
+            Cabe perceber que o tempo de queda não depende da velocidade. Uma esfera lançada com o
+            dobro da velocidade chega ao chão no mesmo instante, só que duas vezes mais longe.
+          </p>
+
+          <h3>2. Como a fotoporta mede a velocidade</h3>
+          <p>
+            A fotoporta na saída da rampa marca o tempo t<sub>b</sub> durante o qual o corpo bloqueia
+            o feixe. Como o feixe passa na altura do centro, nesse tempo o corpo anda exatamente um
+            diâmetro. Assim, v = diâmetro / t<sub>b</sub>. A tabela faz essa conta, e também a do
+            alcance previsto, para cada lançamento.
+          </p>
+          <p>
+            No cilindro com furo, o feixe atravessa o furo e é cortado duas vezes, uma por cada
+            parede. Cabe perceber que o contador mede do começo do primeiro bloqueio ao fim do último,
+            de modo que a conta continua sendo o diâmetro externo dividido por t<sub>b</sub>.
+          </p>
+
+          <h3>3. Procedimento</h3>
+          <ol>
+            <li>Na aba Montagem, anote a altura H da saída ao chão e o diâmetro da esfera.</li>
+            <li>Escolha uma altura de soltura h e solte a esfera uma vez. Na aba Medidas, anote o tempo de bloqueio.</li>
+            <li>
+              Calcule v e o alcance d previsto. Digite o valor em "Alcance previsto" e ponha o alvo no
+              papel. Solte a esfera de novo, da mesma altura, e veja a distância entre a marca e o alvo.
+            </li>
+            <li>Registre o lançamento. Repita com pelo menos cinco alturas entre 0,05 m e 0,25 m.</li>
+            <li>Troque o corpo e repita, com as mesmas alturas, para o cilindro maciço e para o cilindro com furo.</li>
+          </ol>
+
+          <h3>4. Do gráfico ao tempo de queda</h3>
+          <p>
+            Se d = v · t<sub>q</sub>, o gráfico do alcance em função da velocidade é uma reta que passa
+            pela origem, e a inclinação dela é o tempo de queda. O painel compara esse valor com
+            √(2 · H / g).
+          </p>
+
+          <h3>5. Para ir além: a energia na rampa</h3>
+          <p>
+            Se o corpo deslizasse sem atrito, toda a energia potencial viraria energia de translação,
+            e v² = 2 · g · h. Mas ele rola, e parte da energia vai para a rotação. Quanto vai depende
+            de como a massa está distribuída em torno do eixo, o que se mede pelo <b>momento de
+            inércia</b> I. Para um corpo de massa m e raio r que rola sem deslizar, a energia de
+            rotação é β vezes a de translação, com β = I / (m · r²), e a conta dá
+          </p>
+          <p class="formula">v² = 2 · g · h / (1 + β)</p>
+          <p>
+            Quanto mais massa longe do eixo, maior β e mais devagar o corpo sai da rampa. Os três
+            corpos deste experimento têm o mesmo diâmetro externo, de 25 mm; o furo do cilindro furado
+            tem 16 mm.
+          </p>
+          <table class="tab-medidas" style="margin:6px 0 10px">
+            <thead><tr><th style="text-align:left">corpo</th><th>I</th><th>β</th><th>v² / (g · h)</th></tr></thead>
+            <tbody>
+              <tr><td>esfera maciça</td><td class="num">(2/5) · m · r²</td><td class="num">0,400</td><td class="num">1,43</td></tr>
+              <tr><td>cilindro maciço</td><td class="num">(1/2) · m · r²</td><td class="num">0,500</td><td class="num">1,33</td></tr>
+              <tr><td>cilindro com furo</td><td class="num">(1/2) · m · (r² + r<sub>i</sub>²)</td><td class="num">0,705</td><td class="num">1,17</td></tr>
+            </tbody>
+          </table>
+          <p>
+            No cilindro com furo, r<sub>i</sub> é o raio do furo. O segundo gráfico da aba Medidas
+            mostra a reta do corpo escolhido e a compara com a do deslizamento e com a do rolamento.
+          </p>
+
+          <h3>6. Perguntas</h3>
+          <ol>
+            <li>Qual foi a maior distância entre uma marca e o alvo? Em porcentagem do alcance, quanto isso representa?</li>
+            <li>Por que as marcas de uma mesma altura não caem exatamente no mesmo ponto?</li>
+            <li>Se a mesa fosse quatro vezes mais alta, o alcance mudaria em que proporção, para a mesma velocidade de saída?</li>
+            <li>O tempo de queda obtido no gráfico concorda com √(2 · H / g)? Se não, qual fonte de erro pesa mais?</li>
+            <li>Com os dados do segundo gráfico, a esfera rola ou desliza? Por que prever v só a partir de h daria um alcance maior que o medido?</li>
+            <li>Soltos da mesma altura, qual dos três corpos cai mais longe, e qual cai mais perto? Explique pela distribuição da massa.</li>
+            <li>O cilindro com furo tem menos massa que o maciço. É a massa menor que o deixa mais lento? Use a fórmula para responder.</li>
+            <li>Com os pontos dos três corpos juntos, o gráfico do alcance em função de v continua sendo uma reta só? Por quê?</li>
+          </ol>
+
+          <h3>7. O que a simulação leva em conta</h3>
+          <p>
+            Na rampa, os três corpos de aço rolam sem deslizar e sofrem uma pequena resistência ao
+            rolamento; os cilindros têm 25 mm de comprimento e rolam com o eixo atravessado na calha.
+            No ar, a resistência do ar encurta o alcance em um a dois milímetros, um pouco mais nos
+            cilindros, que voam de lado e expõem mais área. De um lançamento para outro a velocidade
+            de saída varia alguns décimos de por cento, e o corpo desvia um pouco para os lados, como
+            acontece com uma rampa real. A fotoporta tem
+            resolução de 0,1 ms, a trena tem divisões de 1 mm e a gravidade vale 9,79 m/s².
+          </p>
+        </article>
+      </div>
+
+    </div>
+  </aside>
+</main>
+
+<script type="module" src="lancamento-horizontal.js"></script>
+<script src="/js/feedback-modal.js"></script>
+</body>
+</html>

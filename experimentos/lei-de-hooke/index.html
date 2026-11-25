@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="/js/theme.js"></script>
+  <link rel="icon" type="image/png" sizes="32x32" href="/img/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/img/icons/favicon-16.png">
+  <link rel="apple-touch-icon" href="/img/icons/apple-touch-icon.png">
+  <meta name="description" content="Lei de Hooke em 3D: pendure massas aferidas em molas, leia o alongamento na régua, determine a constante elástica e compare as associações em série e em paralelo.">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Lei de Hooke — Laboratório — Piras na Física">
+  <meta property="og:description" content="Massas aferidas, molas e régua: a constante elástica e a associação de molas.">
+  <meta property="og:image" content="https://pirasnafisica.com.br/img/og-logo.jpg">
+  <meta property="og:locale" content="pt_BR">
+  <meta property="og:url" content="https://labs.pirasnafisica.com.br/experimentos/lei-de-hooke/">
+  <title>Lei de Hooke — Piras na Física</title>
+
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-TY56KM22X8"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-TY56KM22X8');
+  </script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600;700&family=Playfair+Display:wght@700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../motor/estilo.css">
+
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "/experimentos/vendor/three/three.module.min.js",
+      "three/addons/": "/experimentos/vendor/three/addons/"
+    }
+  }
+  </script>
+</head>
+<body>
+
+<header class="site-header">
+  <a href="https://pirasnafisica.com.br/" class="logo-link">
+    <img src="/img/novo_logo_final.png" alt="Piras na Física" class="logo-img">
+    <div class="logo-text">
+      Lei de Hooke
+      <span>Laboratório · Piras na Física</span>
+    </div>
+  </a>
+  <div class="header-badges">
+    <a class="header-badge opcional" href="/experimentos/">← Experimentos</a>
+    <button class="header-badge" type="button" onclick="FeedbackModal.open()">💬 Sua opinião</button>
+    <button class="header-badge" type="button" id="theme-toggle" aria-label="Alternar tema claro e escuro">🌙</button>
+  </div>
+</header>
+
+<main class="exp">
+
+  <!-- ═══ CENA 3D ═══ -->
+  <section class="exp-cena" id="cena" aria-label="Montagem da lei de Hooke em três dimensões. Arraste para girar a vista.">
+    <div class="exp-barra topo">
+      <div class="grupo-bt" role="group" aria-label="Vistas">
+        <button class="bt-cena" type="button" data-vista="inicial">Inicial</button>
+        <button class="bt-cena" type="button" data-vista="frente">Frente</button>
+        <button class="bt-cena" type="button" data-vista="regua">Régua</button>
+        <button class="bt-cena" type="button" data-vista="massas">Massas</button>
+      </div>
+      <div class="grupo-bt" role="group" aria-label="Tempo da simulação">
+        <button class="bt-cena" type="button" id="bt-pausa" aria-pressed="false">⏸ Pausar</button>
+        <button class="bt-cena" type="button" id="bt-velocidade" title="Velocidade da simulação">1×</button>
+      </div>
+    </div>
+
+    <p class="exp-dica">
+      Clique na pilha de discos para pôr um disco no porta-pesos; clique no porta-pesos para tirar.
+      O botão "Régua" aproxima a vista do ponteiro.
+    </p>
+  </section>
+
+  <!-- ═══ PAINEL ═══ -->
+  <aside class="exp-painel" id="painel">
+    <nav class="exp-abas" role="tablist">
+      <button type="button" role="tab" data-aba="montagem">Montagem</button>
+      <button type="button" role="tab" data-aba="medidas">Medidas</button>
+      <button type="button" role="tab" data-aba="roteiro">Roteiro</button>
+    </nav>
+
+    <div class="exp-conteudo">
+
+      <!-- Montagem -->
+      <div data-painel="montagem">
+        <div class="secao">
+          <h3>Molas</h3>
+          <div id="ctl-montagem"></div>
+        </div>
+        <div class="secao">
+          <h3>Régua</h3>
+          <p style="font-size:0.85rem;color:var(--text2);margin-bottom:8px">
+            Com o porta-pesos vazio e a mola parada, deslize a régua até o zero ficar na altura do ponteiro.
+            Assim a leitura passa a ser o alongamento causado pelos discos.
+          </p>
+          <button class="bt" type="button" id="bt-zero">Alinhar o zero da régua com o ponteiro</button>
+        </div>
+        <div class="secao">
+          <h3>Simulação</h3>
+          <div id="ctl-simulacao"></div>
+          <dl class="leitura" id="lei-modelo" hidden>
+            <dt>Constante elástica da montagem</dt><dd id="lei-keq">—</dd>
+          </dl>
+        </div>
+      </div>
+
+      <!-- Medidas -->
+      <div data-painel="medidas" hidden>
+        <div class="secao">
+          <h3>Massas</h3>
+          <div class="linha-bts" style="margin:0 0 10px">
+            <button class="bt" type="button" id="bt-por">＋ Pôr um disco de 50 g</button>
+            <button class="bt" type="button" id="bt-tirar">− Tirar um disco</button>
+          </div>
+          <dl class="leitura">
+            <dt>Massa acrescentada</dt><dd id="lei-massa">—</dd>
+            <dt>Discos no porta-pesos</dt><dd id="lei-discos">—</dd>
+            <dt>Leitura da régua no ponteiro</dt><dd id="lei-regua">—</dd>
+            <dt>Mola</dt><dd id="lei-estado">—</dd>
+          </dl>
+          <div class="linha-bts">
+            <button class="bt cheio" type="button" id="bt-registrar">Registrar na tabela</button>
+          </div>
+        </div>
+
+        <div class="secao">
+          <h3>Tabela</h3>
+          <div id="tabela"></div>
+          <div class="linha-bts">
+            <button class="bt" type="button" id="bt-csv">Baixar CSV</button>
+            <button class="bt" type="button" id="bt-limpar">Limpar tabela</button>
+          </div>
+        </div>
+
+        <div class="secao">
+          <h3 class="simb" id="titulo-grafico">F em função de x</h3>
+          <div id="grafico"></div>
+          <p class="resultado-ajuste" id="ajuste">Registre ao menos dois pontos desta montagem para ver a reta.</p>
+        </div>
+
+        <div class="secao">
+          <h3>Constantes obtidas</h3>
+          <dl class="leitura" id="resumo-k" hidden></dl>
+          <p class="tab-vazio" id="resumo-vazio">Cada montagem com dois pontos ou mais aparece aqui.</p>
+        </div>
+      </div>
+
+      <!-- Roteiro -->
+      <div data-painel="roteiro" hidden>
+        <article class="roteiro">
+          <h2>Lei de Hooke</h2>
+          <p class="epigrafe">Ut tensio, sic vis. (Como o alongamento, assim a força.)<br>Robert Hooke</p>
+          <p>
+            Hooke publicou a frase em 1676 na forma de um anagrama, e só revelou a solução dois anos
+            depois. Ela resume o que este experimento vai testar: se a força que estica uma mola
+            dobra, o alongamento também dobra. Ao longo do roteiro, você vai medir a constante elástica
+            de três molas e, na sequência, prever e conferir o que acontece quando duas delas são
+            associadas em série e em paralelo.
+          </p>
+
+          <h3>1. O modelo</h3>
+          <p>
+            Uma mola esticada de um <b>alongamento</b> x exerce uma força elástica proporcional a ele:
+          </p>
+          <p class="formula">F = k · x</p>
+          <p>
+            A constante k, a <b>constante elástica</b>, mede a rigidez da mola e se expressa em N/m.
+            Uma mola com k = 20 N/m precisa de 20 N para esticar um metro, ou de 0,2 N para esticar um
+            centímetro. Neste experimento a força vem do peso dos discos: em repouso, a mola puxa o
+            porta-pesos para cima com a mesma força com que o peso P = m · g puxa para baixo. Cabe
+            perceber que a lei só vale até o limite elástico. Além dele a mola se deforma de vez e não
+            volta ao comprimento original.
+          </p>
+
+          <h3>2. Procedimento</h3>
+          <ol>
+            <li>Na aba Montagem, escolha a mola 1 e alinhe o zero da régua com o ponteiro, com o porta-pesos vazio.</li>
+            <li>
+              Na aba Medidas, ponha um disco de 50 g. A mola oscila e para depois de alguns
+              segundos; só então leia a régua e registre.
+            </li>
+            <li>Repita disco a disco até 500 g. Na sequência, faça o mesmo com as molas 2 e 3.</li>
+            <li>Antes de montar as associações, faça as previsões do item 4. Depois, meça as duas.</li>
+          </ol>
+
+          <h3>3. Do gráfico à constante elástica</h3>
+          <p>
+            Se a lei de Hooke vale, o gráfico da força F em função do alongamento x é uma reta que
+            passa pela origem, e a inclinação dela é k. O painel ajusta a reta aos pontos da montagem
+            atual e guarda, no quadro "Constantes obtidas", o k de cada montagem já medida.
+          </p>
+
+          <h3>4. Molas associadas</h3>
+          <p>
+            Em <b>série</b>, uma mola pendurada na outra, as duas sustentam o peso inteiro e cada uma
+            estica o que esticaria sozinha. Os alongamentos se somam, e a montagem fica mais macia:
+          </p>
+          <p class="formula">1 / k<sub>s</sub> = 1 / k<sub>1</sub> + 1 / k<sub>2</sub></p>
+          <p>
+            Em <b>paralelo</b>, lado a lado e presas a uma travessa, as duas esticam o mesmo tanto e
+            dividem o peso. As forças se somam, e a montagem fica mais dura:
+          </p>
+          <p class="formula">k<sub>p</sub> = k<sub>1</sub> + k<sub>2</sub></p>
+          <p>
+            Com os valores medidos de k<sub>1</sub> e k<sub>2</sub>, calcule k<sub>s</sub> e
+            k<sub>p</sub> antes de medir. A comparação com a medida é o resultado da segunda parte.
+          </p>
+
+          <h3>5. Perguntas</h3>
+          <ol>
+            <li>Os pontos de cada mola ficaram sobre uma reta que passa pela origem? O que isso diz sobre a lei de Hooke nesta faixa de forças?</li>
+            <li>As molas 1 e 2 parecem iguais. As constantes medidas foram iguais? A diferença é maior ou menor que a incerteza da medida?</li>
+            <li>Qual é a diferença entre o k<sub>s</sub> previsto e o medido? E entre o k<sub>p</sub> previsto e o medido?</li>
+            <li>Duas molas iguais em série equivalem a uma mola de que constante? E em paralelo?</li>
+            <li>Por que alinhar o zero com o porta-pesos já pendurado, e não com a mola sozinha, não altera o valor de k?</li>
+          </ol>
+
+          <h3>6. O que a simulação leva em conta</h3>
+          <p>
+            As molas 1 e 2 saíram do mesmo lote, mas as constantes delas diferem em alguns por cento,
+            como acontece com molas reais. A massa da própria mola entra na conta: metade do peso dela
+            também a estica, e um terço da massa dela oscila junto com a carga. A oscilação perde
+            energia para o ar e para o atrito interno do aço e some em alguns segundos. O porta-pesos
+            tem 20 g, a travessa do paralelo tem 15 g, a régua tem divisões de 1 mm e a gravidade vale
+            9,79 m/s². Nenhuma montagem chega ao limite elástico com os dez discos.
+          </p>
+        </article>
+      </div>
+
+    </div>
+  </aside>
+</main>
+
+<script type="module" src="lei-de-hooke.js"></script>
+<script src="/js/feedback-modal.js"></script>
+</body>
+</html>

@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="/js/theme.js"></script>
+  <link rel="icon" type="image/png" sizes="32x32" href="/img/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/img/icons/favicon-16.png">
+  <link rel="apple-touch-icon" href="/img/icons/apple-touch-icon.png">
+  <meta name="description" content="Queda livre e máquina de Atwood em 3D: fotoportas numa coluna graduada medem o tempo de queda, e a roldana com duas massas reduz a aceleração de modo controlado.">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Queda livre e máquina de Atwood — Laboratório — Piras na Física">
+  <meta property="og:description" content="Fotoportas em série, a aceleração da gravidade e a aceleração reduzida pela roldana.">
+  <meta property="og:image" content="https://pirasnafisica.com.br/img/og-logo.jpg">
+  <meta property="og:locale" content="pt_BR">
+  <meta property="og:url" content="https://labs.pirasnafisica.com.br/experimentos/queda-livre-atwood/">
+  <title>Queda livre e máquina de Atwood — Piras na Física</title>
+
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-TY56KM22X8"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-TY56KM22X8');
+  </script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600;700&family=Playfair+Display:wght@700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../motor/estilo.css">
+
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "/experimentos/vendor/three/three.module.min.js",
+      "three/addons/": "/experimentos/vendor/three/addons/"
+    }
+  }
+  </script>
+</head>
+<body>
+
+<header class="site-header">
+  <a href="https://pirasnafisica.com.br/" class="logo-link">
+    <img src="/img/novo_logo_final.png" alt="Piras na Física" class="logo-img">
+    <div class="logo-text">
+      Queda livre e máquina de Atwood
+      <span>Laboratório · Piras na Física</span>
+    </div>
+  </a>
+  <div class="header-badges">
+    <a class="header-badge opcional" href="/experimentos/">← Experimentos</a>
+    <button class="header-badge" type="button" onclick="FeedbackModal.open()">💬 Sua opinião</button>
+    <button class="header-badge" type="button" id="theme-toggle" aria-label="Alternar tema claro e escuro">🌙</button>
+  </div>
+</header>
+
+<main class="exp">
+
+  <!-- ═══ CENA 3D ═══ -->
+  <section class="exp-cena" id="cena" aria-label="Coluna de queda com fotoportas, em três dimensões. Arraste para girar a vista.">
+    <div class="exp-barra topo">
+      <div class="grupo-bt" role="group" aria-label="Vistas">
+        <button class="bt-cena" type="button" data-vista="inicial">Inicial</button>
+        <button class="bt-cena" type="button" data-vista="frente">Frente</button>
+        <button class="bt-cena" type="button" data-vista="largada">Largada</button>
+        <button class="bt-cena" type="button" data-vista="escala">Escala</button>
+        <button class="bt-cena" type="button" data-vista="cronometro">Cronômetro</button>
+      </div>
+      <div class="grupo-bt" role="group" aria-label="Tempo da simulação">
+        <button class="bt-cena" type="button" id="bt-pausa" aria-pressed="false">⏸ Pausar</button>
+        <button class="bt-cena" type="button" id="bt-velocidade" title="Velocidade da simulação">1×</button>
+      </div>
+    </div>
+
+    <div class="exp-barra base">
+      <button class="bt-cena principal" type="button" id="bt-soltar">Soltar a esfera</button>
+    </div>
+
+    <p class="exp-dica">
+      Clique na esfera, ou nas massas, para soltar. As fotoportas podem ser arrastadas ao longo
+      da coluna. A queda dura menos de meio segundo: a câmera lenta ajuda a acompanhar.
+    </p>
+  </section>
+
+  <!-- ═══ PAINEL ═══ -->
+  <aside class="exp-painel" id="painel">
+    <nav class="exp-abas" role="tablist">
+      <button type="button" role="tab" data-aba="montagem">Montagem</button>
+      <button type="button" role="tab" data-aba="medidas">Medidas</button>
+      <button type="button" role="tab" data-aba="roteiro">Roteiro</button>
+    </nav>
+
+    <div class="exp-conteudo">
+
+      <!-- Montagem -->
+      <div data-painel="montagem">
+        <div class="secao">
+          <div id="ctl-modo"></div>
+        </div>
+        <div class="secao" id="sec-atwood" hidden>
+          <h3>Máquina de Atwood</h3>
+          <div id="ctl-atwood"></div>
+        </div>
+        <div class="secao">
+          <h3>Fotoportas (d desde a largada, na escala)</h3>
+          <div id="ctl-sensores"></div>
+        </div>
+        <div class="secao">
+          <h3>Leituras da montagem</h3>
+          <dl class="leitura">
+            <dt>Corpo</dt><dd id="lei-corpo">—</dd>
+            <dt>d até a fotoporta 1</dt><dd id="lei-d1">—</dd>
+            <dt>d até a fotoporta 2</dt><dd id="lei-d2">—</dd>
+            <dt>d até a fotoporta 3</dt><dd id="lei-d3">—</dd>
+            <dt>d até a fotoporta 4</dt><dd id="lei-d4">—</dd>
+          </dl>
+        </div>
+        <div class="secao">
+          <h3>Simulação</h3>
+          <div id="ctl-simulacao"></div>
+          <dl class="leitura" id="lei-modelo" hidden>
+            <dt>a pelo modelo ideal</dt><dd id="lei-aideal">—</dd>
+            <dt>a prevista para esta montagem</dt><dd id="lei-amodelo">—</dd>
+          </dl>
+        </div>
+      </div>
+
+      <!-- Medidas -->
+      <div data-painel="medidas" hidden>
+        <div class="secao">
+          <h3>Cronômetro (tempo desde a largada)</h3>
+          <dl class="leitura">
+            <dt>Sensor 1</dt><dd id="lei-t1">—</dd>
+            <dt>Sensor 2</dt><dd id="lei-t2">—</dd>
+            <dt>Sensor 3</dt><dd id="lei-t3">—</dd>
+            <dt>Sensor 4</dt><dd id="lei-t4">—</dd>
+          </dl>
+          <div class="linha-bts">
+            <button class="bt cheio" type="button" id="bt-registrar">Registrar na tabela</button>
+            <button class="bt" type="button" id="bt-zerar">Zerar</button>
+          </div>
+        </div>
+
+        <div class="secao">
+          <h3>Tabela</h3>
+          <div id="tabela"></div>
+          <div class="linha-bts">
+            <button class="bt" type="button" id="bt-csv">Baixar CSV</button>
+            <button class="bt" type="button" id="bt-limpar">Limpar tabela</button>
+          </div>
+        </div>
+
+        <div class="secao">
+          <h3 class="simb" id="titulo-grafico">Queda livre: d em função de t²</h3>
+          <div id="grafico"></div>
+          <p class="resultado-ajuste" id="ajuste">Registre ao menos dois pontos de queda livre para ver a reta.</p>
+        </div>
+      </div>
+
+      <!-- Roteiro -->
+      <div data-painel="roteiro" hidden>
+        <article class="roteiro">
+          <h2>Queda livre e máquina de Atwood</h2>
+
+          <p>
+            Este experimento tem duas partes que respondem à mesma pergunta por caminhos diferentes:
+            quanto vale a aceleração da gravidade. Na primeira, uma esfera de aço cai livremente e
+            quatro fotoportas marcam o tempo de passagem. Na segunda, uma roldana com duas massas
+            quase iguais reduz a aceleração, e o que se mede é como ela depende da diferença entre as
+            massas.
+          </p>
+          <p>
+            A segunda montagem tem história. George Atwood a construiu em 1784 pelo mesmo motivo que
+            levou Galileu ao plano inclinado: a queda livre é rápida demais para ser acompanhada a olho.
+            Com a roldana, a queda fica lenta o bastante para ser medida com um relógio de pêndulo.
+          </p>
+
+          <h3>1. Queda livre</h3>
+          <p>
+            Um corpo solto do repouso, quando a resistência do ar é desprezível, cai com aceleração
+            igual a g. O deslocamento d depois de um tempo t é
+          </p>
+          <p class="formula">d = g · t² / 2</p>
+          <p>
+            O gráfico de d em função de t² é, então, uma reta pela origem com inclinação g / 2.
+          </p>
+
+          <h3>2. Máquina de Atwood</h3>
+          <p>
+            Duas massas penduradas nas pontas de um fio que passa por uma roldana. Se m<sub>2</sub> é um
+            pouco maior que m<sub>1</sub>, ela desce e m<sub>1</sub> sobe. Quem acelera o conjunto é a
+            diferença entre os pesos, (m<sub>2</sub> − m<sub>1</sub>) · g; quem resiste é a massa total
+            que se move. Desprezando a massa da roldana e o atrito,
+          </p>
+          <p class="formula">a = g · (m<sub>2</sub> − m<sub>1</sub>) / (m<sub>1</sub> + m<sub>2</sub>)</p>
+          <p>
+            O gráfico de a em função da razão (m<sub>2</sub> − m<sub>1</sub>) / (m<sub>1</sub> + m<sub>2</sub>)
+            é uma reta pela origem com inclinação g. Cabe perceber que a roldana real tem massa e
+            atrito no eixo, e as duas coisas aparecem no gráfico, cada uma de um jeito.
+          </p>
+
+          <h3>3. Procedimento</h3>
+          <ol>
+            <li>
+              Com o modo Queda livre, posicione as quatro fotoportas. O painel mostra o deslocamento
+              d de cada uma, lido na escala da coluna, cujo zero coincide com a parte de baixo da
+              esfera presa ao eletroímã.
+            </li>
+            <li>
+              Solte a esfera e registre os quatro tempos. Mude as fotoportas de lugar e repita até ter
+              pelo menos oito pontos.
+            </li>
+            <li>
+              Passe ao modo Máquina de Atwood. Com 170 g de cada lado e 10 g de sobrecarga, solte as
+              massas e registre. Na tabela, a coluna a = 2 · d / t² dá a aceleração de cada ponto.
+            </li>
+            <li>
+              Repita com outras sobrecargas e outras massas de cada lado, até ter pelo menos cinco
+              valores diferentes da razão entre as massas.
+            </li>
+          </ol>
+
+          <h3>4. Perguntas</h3>
+          <ol>
+            <li>Na queda livre, qual valor de g a reta forneceu? Qual é a diferença em relação a 9,79 m/s²?</li>
+            <li>Com 10 g de sobrecarga e 170 g de cada lado, a aceleração é quantas vezes menor que g? Por que isso facilita a medida?</li>
+            <li>Mantendo a sobrecarga e aumentando a massa de cada lado, a aceleração aumenta ou diminui? Explique pela fórmula.</li>
+            <li>A reta da Atwood deu uma inclinação menor que g. Qual efeito da roldana explica isso?</li>
+            <li>A mesma reta corta o eixo horizontal um pouco à direita da origem. Que efeito da roldana explica esse deslocamento?</li>
+          </ol>
+
+          <h3>5. O que a simulação leva em conta</h3>
+          <p>
+            Na queda livre, a esfera de aço de 16 mm sofre a resistência do ar, que nesta altura atrasa a
+            chegada em menos de um décimo de milésimo de segundo; a fotoporta registra o instante em
+            que a parte de baixo da esfera corta o feixe. Na Atwood, a roldana de alumínio gira junto com
+            o fio, o que equivale a acrescentar 15 g à massa que precisa ser acelerada, e o eixo tem um
+            atrito pequeno, equivalente a uma sobrecarga de cerca de 0,2 g. O fio é inextensível e sem
+            massa. O cronômetro tem resolução de 0,1 ms e a gravidade vale 9,79 m/s².
+          </p>
+        </article>
+      </div>
+
+    </div>
+  </aside>
+</main>
+
+<script type="module" src="queda-livre-atwood.js"></script>
+<script src="/js/feedback-modal.js"></script>
+</body>
+</html>

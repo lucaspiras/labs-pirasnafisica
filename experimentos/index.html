@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="/js/theme.js"></script>
+  <link rel="icon" type="image/png" sizes="32x32" href="/img/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/img/icons/favicon-16.png">
+  <link rel="apple-touch-icon" href="/img/icons/apple-touch-icon.png">
+  <meta name="description" content="Laboratório de Física em 3D: experimentos de ensino médio, graduação e experimentos clássicos, com instrumentos de medida e câmera livre.">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Laboratório de experimentos — Piras na Física">
+  <meta property="og:description" content="Experimentos de Física em 3D, com instrumentos de medida e câmera livre.">
+  <meta property="og:image" content="https://pirasnafisica.com.br/img/og-logo.jpg">
+  <meta property="og:locale" content="pt_BR">
+  <meta property="og:url" content="https://labs.pirasnafisica.com.br/experimentos/">
+  <title>Laboratório de experimentos — Piras na Física</title>
+
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-TY56KM22X8"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-TY56KM22X8');
+  </script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600;700&family=Playfair+Display:wght@700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="motor/estilo.css">
+</head>
+<body>
+
+<header class="site-header">
+  <a href="https://pirasnafisica.com.br/" class="logo-link">
+    <img src="/img/novo_logo_final.png" alt="Piras na Física" class="logo-img">
+    <div class="logo-text">
+      Laboratório de experimentos
+      <span>Piras na Física</span>
+    </div>
+  </a>
+  <div class="header-badges">
+    <a class="header-badge opcional" href="/">← Simulações</a>
+    <button class="header-badge" type="button" onclick="FeedbackModal.open()">💬 Sua opinião</button>
+    <button class="header-badge" type="button" id="theme-toggle" aria-label="Alternar tema claro e escuro">🌙</button>
+  </div>
+</header>
+
+<main class="lista">
+  <h1>Laboratório de experimentos</h1>
+  <p class="intro">
+    Cada experimento é uma bancada em três dimensões: dá para girar a montagem, olhar de perto
+    os instrumentos e medir como num laboratório de verdade, com cronômetro, trena e sensores.
+    As medidas vão para uma tabela, que pode ser baixada para a planilha.
+  </p>
+
+  <section class="bloco">
+    <h2>Mecânica</h2>
+    <div class="cartoes">
+      <a class="cartao" href="pendulo-simples/">
+        <div class="topo"><span class="icone">🕰️</span><span class="nivel">Ensino médio</span></div>
+        <h3>Pêndulo simples</h3>
+        <p>Período em função do comprimento, cronômetro e fotoporta, e o valor de g a partir do gráfico.</p>
+      </a>
+      <a class="cartao" href="plano-inclinado/">
+        <div class="topo"><span class="icone">📐</span><span class="nivel">Ensino médio</span></div>
+        <h3>Plano inclinado de Galileu</h3>
+        <p>Carrinho e fotoportas: o movimento uniformemente variado medido ponto a ponto.</p>
+      </a>
+      <a class="cartao" href="lei-de-hooke/">
+        <div class="topo"><span class="icone">🌀</span><span class="nivel">Ensino médio</span></div>
+        <h3>Lei de Hooke</h3>
+        <p>Molas, massas aferidas e régua; associação de molas em série e em paralelo.</p>
+      </a>
+      <a class="cartao" href="queda-livre-atwood/">
+        <div class="topo"><span class="icone">⬇️</span><span class="nivel">Médio e graduação</span></div>
+        <h3>Queda livre e máquina de Atwood</h3>
+        <p>Fotoportas em série e a aceleração reduzida pela roldana.</p>
+      </a>
+      <a class="cartao" href="lancamento-horizontal/">
+        <div class="topo"><span class="icone">🎯</span><span class="nivel">Ensino médio</span></div>
+        <h3>Lançamento horizontal</h3>
+        <p>Rampa sobre a mesa e a marca no papel: prever onde a esfera cai.</p>
+      </a>
+      <a class="cartao" href="colisoes/">
+        <div class="topo"><span class="icone">💥</span><span class="nivel">Médio e graduação</span></div>
+        <h3>Colisões em trilho de ar</h3>
+        <p>Conservação da quantidade de movimento em choques elásticos e inelásticos.</p>
+      </a>
+    </div>
+  </section>
+
+  <section class="bloco">
+    <h2>Termodinâmica</h2>
+    <div class="cartoes">
+      <div class="cartao em-breve">
+        <div class="topo"><span class="icone">🌡️</span><span class="nivel">Ensino médio</span></div>
+        <h3>Calorimetria</h3>
+        <p>Calorímetro, equilíbrio térmico e o calor específico de um metal.</p>
+      </div>
+      <div class="cartao em-breve">
+        <div class="topo"><span class="icone">📏</span><span class="nivel">Ensino médio</span></div>
+        <h3>Dilatação linear</h3>
+        <p>Dilatômetro com relógio comparador e o coeficiente de dilatação.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="bloco">
+    <h2>Eletricidade e magnetismo</h2>
+    <div class="cartoes">
+      <div class="cartao em-breve">
+        <div class="topo"><span class="icone">🔌</span><span class="nivel">Ensino médio</span></div>
+        <h3>Lei de Ohm</h3>
+        <p>Protoboard, fonte e multímetro como voltímetro e amperímetro.</p>
+      </div>
+      <div class="cartao em-breve">
+        <div class="topo"><span class="icone">🔗</span><span class="nivel">Ensino médio</span></div>
+        <h3>Associação de resistores</h3>
+        <p>Série, paralelo e mista, conferidas com o multímetro.</p>
+      </div>
+      <div class="cartao em-breve">
+        <div class="topo"><span class="icone">🧲</span><span class="nivel">Médio e graduação</span></div>
+        <h3>Indução de Faraday</h3>
+        <p>Ímã atravessando uma bobina e o ponteiro do galvanômetro.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="bloco">
+    <h2>Óptica e ondas</h2>
+    <div class="cartoes">
+      <div class="cartao em-breve">
+        <div class="topo"><span class="icone">🔍</span><span class="nivel">Ensino médio</span></div>
+        <h3>Banco óptico</h3>
+        <p>Lente convergente, objeto luminoso e anteparo: onde se forma a imagem.</p>
+      </div>
+      <div class="cartao em-breve">
+        <div class="topo"><span class="icone">🔦</span><span class="nivel">Ensino médio</span></div>
+        <h3>Refração e reflexão total</h3>
+        <p>Semicilindro de acrílico, laser e disco graduado.</p>
+      </div>
+      <div class="cartao em-breve">
+        <div class="topo"><span class="icone">〰️</span><span class="nivel">Médio e graduação</span></div>
+        <h3>Ondas estacionárias em corda</h3>
+        <p>Vibrador, roldana e massas: os harmônicos da experiência de Melde.</p>
+      </div>
+      <div class="cartao em-breve">
+        <div class="topo"><span class="icone">🔊</span><span class="nivel">Graduação</span></div>
+        <h3>Tubo de ressonância</h3>
+        <p>Diapasão e coluna de ar: a velocidade do som.</p>
+      </div>
+      <div class="cartao em-breve">
+        <div class="topo"><span class="icone">🌈</span><span class="nivel">Médio e graduação</span></div>
+        <h3>Fenda dupla de Young</h3>
+        <p>Laser, fendas e o padrão de interferência medido no anteparo.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="bloco">
+    <h2>Experimentos clássicos</h2>
+    <div class="cartoes">
+      <div class="cartao em-breve">
+        <div class="topo"><span class="icone">⚖️</span><span class="nivel">Graduação</span></div>
+        <h3>Balança de Cavendish</h3>
+        <p>A constante da gravitação a partir de uma balança de torção.</p>
+      </div>
+      <div class="cartao em-breve">
+        <div class="topo"><span class="icone">💧</span><span class="nivel">Graduação</span></div>
+        <h3>Gota de óleo de Millikan</h3>
+        <p>A carga elementar a partir de gotas suspensas num campo elétrico.</p>
+      </div>
+      <div class="cartao em-breve">
+        <div class="topo"><span class="icone">📺</span><span class="nivel">Graduação</span></div>
+        <h3>Razão e/m de Thomson</h3>
+        <p>Feixe de elétrons curvado pelas bobinas de Helmholtz.</p>
+      </div>
+      <div class="cartao em-breve">
+        <div class="topo"><span class="icone">💡</span><span class="nivel">Graduação</span></div>
+        <h3>Efeito fotoelétrico</h3>
+        <p>Potencial de corte em função da frequência e a constante de Planck.</p>
+      </div>
+    </div>
+  </section>
+</main>
+
+<script src="/js/feedback-modal.js"></script>
+</body>
+</html>

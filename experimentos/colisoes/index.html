@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="/js/theme.js"></script>
+  <link rel="icon" type="image/png" sizes="32x32" href="/img/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/img/icons/favicon-16.png">
+  <link rel="apple-touch-icon" href="/img/icons/apple-touch-icon.png">
+  <meta name="description" content="Colisões em trilho de ar em 3D: dois planadores, fotoportas e para-choques de mola ou velcro para testar a conservação da quantidade de movimento e da energia cinética.">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Colisões em trilho de ar — Laboratório — Piras na Física">
+  <meta property="og:description" content="Conservação da quantidade de movimento em choques elásticos e inelásticos.">
+  <meta property="og:image" content="https://pirasnafisica.com.br/img/og-logo.jpg">
+  <meta property="og:locale" content="pt_BR">
+  <meta property="og:url" content="https://labs.pirasnafisica.com.br/experimentos/colisoes/">
+  <title>Colisões em trilho de ar — Piras na Física</title>
+
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-TY56KM22X8"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-TY56KM22X8');
+  </script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600;700&family=Playfair+Display:wght@700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../motor/estilo.css">
+
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "/experimentos/vendor/three/three.module.min.js",
+      "three/addons/": "/experimentos/vendor/three/addons/"
+    }
+  }
+  </script>
+</head>
+<body>
+
+<header class="site-header">
+  <a href="https://pirasnafisica.com.br/" class="logo-link">
+    <img src="/img/novo_logo_final.png" alt="Piras na Física" class="logo-img">
+    <div class="logo-text">
+      Colisões em trilho de ar
+      <span>Laboratório · Piras na Física</span>
+    </div>
+  </a>
+  <div class="header-badges">
+    <a class="header-badge opcional" href="/experimentos/">← Experimentos</a>
+    <button class="header-badge" type="button" onclick="FeedbackModal.open()">💬 Sua opinião</button>
+    <button class="header-badge" type="button" id="theme-toggle" aria-label="Alternar tema claro e escuro">🌙</button>
+  </div>
+</header>
+
+<main class="exp">
+
+  <!-- ═══ CENA 3D ═══ -->
+  <section class="exp-cena" id="cena" aria-label="Trilho de ar com dois planadores, em três dimensões. Arraste para girar a vista.">
+    <div class="exp-barra topo">
+      <div class="grupo-bt" role="group" aria-label="Vistas">
+        <button class="bt-cena" type="button" data-vista="inicial">Inicial</button>
+        <button class="bt-cena" type="button" data-vista="frente">Frente</button>
+        <button class="bt-cena" type="button" data-vista="cima">Cima</button>
+        <button class="bt-cena" type="button" data-vista="choque">Choque</button>
+        <button class="bt-cena" type="button" data-vista="fotoportas">Fotoportas</button>
+      </div>
+      <div class="grupo-bt" role="group" aria-label="Tempo da simulação">
+        <button class="bt-cena" type="button" id="bt-pausa" aria-pressed="false">⏸ Pausar</button>
+        <button class="bt-cena" type="button" id="bt-velocidade" title="Velocidade da simulação">1×</button>
+      </div>
+    </div>
+
+    <div class="exp-barra base">
+      <button class="bt-cena principal" type="button" id="bt-disparar">Disparar o planador A</button>
+    </div>
+
+    <p class="exp-dica">
+      Clique no planador azul para dispará-lo contra o laranja. No aparelho das fotoportas, o botão
+      CANAL troca a porta mostrada no visor.
+    </p>
+  </section>
+
+  <!-- ═══ PAINEL ═══ -->
+  <aside class="exp-painel" id="painel">
+    <nav class="exp-abas" role="tablist">
+      <button type="button" role="tab" data-aba="montagem">Montagem</button>
+      <button type="button" role="tab" data-aba="medidas">Medidas</button>
+      <button type="button" role="tab" data-aba="roteiro">Roteiro</button>
+    </nav>
+
+    <div class="exp-conteudo">
+
+      <!-- Montagem -->
+      <div data-painel="montagem">
+        <div class="secao">
+          <h3>Planadores</h3>
+          <div id="ctl-montagem"></div>
+        </div>
+        <div class="secao">
+          <h3>Leituras da montagem</h3>
+          <dl class="leitura">
+            <dt>Massa do planador A (balança)</dt><dd id="lei-ma">—</dd>
+            <dt>Massa do planador B (balança)</dt><dd id="lei-mb">—</dd>
+            <dt>Largura da bandeira (paquímetro)</dt><dd id="lei-band">—</dd>
+          </dl>
+        </div>
+        <div class="secao">
+          <h3>Simulação</h3>
+          <div id="ctl-simulacao"></div>
+        </div>
+      </div>
+
+      <!-- Medidas -->
+      <div data-painel="medidas" hidden>
+        <div class="secao">
+          <h3>Passagens pelas fotoportas</h3>
+          <div id="passagens"></div>
+          <div class="linha-bts">
+            <button class="bt cheio" type="button" id="bt-registrar">Registrar a colisão</button>
+          </div>
+        </div>
+
+        <div class="secao">
+          <h3>Tabela</h3>
+          <div id="tabela"></div>
+          <p class="tab-vazio" style="padding-top:4px">
+            Q em kg·m/s, E<sub>c</sub> em J. O apóstrofo indica a velocidade depois do choque; B parte do repouso.
+          </p>
+          <div class="linha-bts">
+            <button class="bt" type="button" id="bt-csv">Baixar CSV</button>
+            <button class="bt" type="button" id="bt-limpar">Limpar tabela</button>
+          </div>
+        </div>
+
+        <div class="secao">
+          <h3 class="simb">Q depois em função de Q antes</h3>
+          <div id="grafico-q"></div>
+          <p class="resultado-ajuste" id="ajuste-q">Registre ao menos duas colisões para ver a reta.</p>
+        </div>
+
+        <div class="secao">
+          <h3 class="simb" id="titulo-grafico-e">E<sub>c</sub> depois em função de E<sub>c</sub> antes</h3>
+          <div id="grafico-e"></div>
+          <p class="resultado-ajuste" id="ajuste-e">Registre ao menos duas colisões para ver a reta.</p>
+        </div>
+      </div>
+
+      <!-- Roteiro -->
+      <div data-painel="roteiro" hidden>
+        <article class="roteiro">
+          <h2>Colisões em trilho de ar</h2>
+
+          <p>
+            No trilho de ar, um compressor sopra ar por centenas de furinhos, e os planadores flutuam
+            sobre um colchão de ar com atrito quase nulo. É o mais perto que um laboratório chega de
+            um corpo livre de forças externas na horizontal. Neste experimento você vai provocar
+            colisões entre dois planadores e verificar o que se conserva nelas. Primeiro vêm as
+            colisões elásticas, com para-choques de mola; depois, as inelásticas, com velcro.
+          </p>
+
+          <h3>1. O modelo</h3>
+          <p>
+            A <b>quantidade de movimento</b> de um corpo é o produto da massa pela velocidade,
+            Q = m · v. Cabe perceber que ela tem sentido: um planador que anda para a esquerda tem
+            velocidade e quantidade de movimento negativas. Quando nenhuma força externa age na
+            horizontal, a quantidade de movimento total se conserva no choque:
+          </p>
+          <p class="formula">m<sub>A</sub> · v<sub>A</sub> + m<sub>B</sub> · v<sub>B</sub> = m<sub>A</sub> · v<sub>A</sub>′ + m<sub>B</sub> · v<sub>B</sub>′</p>
+          <p>
+            O apóstrofo indica a velocidade depois do choque. A energia cinética,
+            E<sub>c</sub> = m · v² / 2, só se conserva na colisão <b>elástica</b>. Na inelástica, uma
+            parte dela vira calor e deformação do velcro, e os planadores saem juntos.
+          </p>
+
+          <h3>2. Como as fotoportas medem a velocidade</h3>
+          <p>
+            Cada planador carrega uma bandeira de 50 mm. A fotoporta mede o tempo em que a bandeira
+            bloqueia o feixe, e a velocidade é a largura da bandeira dividida por esse tempo. O
+            aparelho não sabe o sentido do movimento; quem vê é você. Na lista de passagens, a seta
+            indica o sentido, e o painel já usa o sinal certo ao registrar.
+          </p>
+
+          <h3>3. Procedimento</h3>
+          <ol>
+            <li>Com para-choques de mola e os dois planadores de 200 g, dispare o planador A contra o B, que está parado entre as fotoportas.</li>
+            <li>
+              Espere o B passar pela fotoporta 2 e o A passar por alguma fotoporta, ou parar. Na aba
+              Medidas, registre a colisão.
+            </li>
+            <li>Repita com A mais pesado que B e com A mais leve que B, e com tensões diferentes do disparador.</li>
+            <li>Troque para velcro e faça a mesma série.</li>
+          </ol>
+
+          <h3>4. Os dois gráficos</h3>
+          <p>
+            Se a quantidade de movimento se conserva, os pontos de Q depois em função de Q antes
+            caem sobre a reta de inclinação 1, para os dois tipos de colisão. No gráfico da energia
+            cinética, a inclinação é a fração da energia que sobra depois do choque: perto de 1 nas
+            elásticas e bem abaixo disso nas inelásticas.
+          </p>
+
+          <h3>5. Perguntas</h3>
+          <ol>
+            <li>Nas colisões elásticas com massas iguais, o que acontece com o planador A depois do choque? Por quê?</li>
+            <li>A quantidade de movimento se conservou nos dois tipos de colisão? E a energia cinética?</li>
+            <li>Nas colisões com velcro, que fração da energia cinética sobrou com massas iguais? Compare com a previsão m<sub>A</sub> / (m<sub>A</sub> + m<sub>B</sub>).</li>
+            <li>Com A mais leve que B, o planador A volta. Como fica o sinal de Q depois, nesse caso?</li>
+            <li>Mesmo nas colisões com molas, um pouco de energia cinética some. Para onde ela vai?</li>
+          </ol>
+
+          <h3>6. O que a simulação leva em conta</h3>
+          <p>
+            O colchão de ar deixa um atrito muito pequeno, que reduz a velocidade em cerca de 1,5 %
+            a cada segundo. As lâminas de mola devolvem 94 % da velocidade relativa no choque, e não
+            100 %, como lâminas reais. A tensão do disparador fixa a energia entregue ao planador A,
+            de modo que um planador mais pesado sai mais devagar, e de um disparo para outro a
+            velocidade varia cerca de 1,5 %. As fotoportas têm resolução de 0,1 ms.
+          </p>
+        </article>
+      </div>
+
+    </div>
+  </aside>
+</main>
+
+<script type="module" src="colisoes.js"></script>
+<script src="/js/feedback-modal.js"></script>
+</body>
+</html>

@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="/js/theme.js"></script>
+  <link rel="icon" type="image/png" sizes="32x32" href="/img/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/img/icons/favicon-16.png">
+  <link rel="apple-touch-icon" href="/img/icons/apple-touch-icon.png">
+  <meta name="description" content="Plano inclinado de Galileu em 3D: carrinho, quatro fotoportas e cronômetro digital para medir o movimento uniformemente variado e determinar a aceleração da gravidade.">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Plano inclinado de Galileu — Laboratório — Piras na Física">
+  <meta property="og:description" content="Meça o deslocamento e o tempo de um carrinho num trilho inclinado e obtenha a aceleração e o valor de g.">
+  <meta property="og:image" content="https://pirasnafisica.com.br/img/og-logo.jpg">
+  <meta property="og:locale" content="pt_BR">
+  <meta property="og:url" content="https://labs.pirasnafisica.com.br/experimentos/plano-inclinado/">
+  <title>Plano inclinado de Galileu — Piras na Física</title>
+
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-TY56KM22X8"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-TY56KM22X8');
+  </script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600;700&family=Playfair+Display:wght@700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../motor/estilo.css">
+
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "/experimentos/vendor/three/three.module.min.js",
+      "three/addons/": "/experimentos/vendor/three/addons/"
+    }
+  }
+  </script>
+</head>
+<body>
+
+<header class="site-header">
+  <a href="https://pirasnafisica.com.br/" class="logo-link">
+    <img src="/img/novo_logo_final.png" alt="Piras na Física" class="logo-img">
+    <div class="logo-text">
+      Plano inclinado de Galileu
+      <span>Laboratório · Piras na Física</span>
+    </div>
+  </a>
+  <div class="header-badges">
+    <a class="header-badge opcional" href="/experimentos/">← Experimentos</a>
+    <button class="header-badge" type="button" onclick="FeedbackModal.open()">💬 Sua opinião</button>
+    <button class="header-badge" type="button" id="theme-toggle" aria-label="Alternar tema claro e escuro">🌙</button>
+  </div>
+</header>
+
+<main class="exp">
+
+  <!-- ═══ CENA 3D ═══ -->
+  <section class="exp-cena" id="cena" aria-label="Montagem do plano inclinado em três dimensões. Arraste para girar a vista.">
+    <div class="exp-barra topo">
+      <div class="grupo-bt" role="group" aria-label="Vistas">
+        <button class="bt-cena" type="button" data-vista="inicial">Inicial</button>
+        <button class="bt-cena" type="button" data-vista="frente">Frente</button>
+        <button class="bt-cena" type="button" data-vista="cima">Cima</button>
+        <button class="bt-cena" type="button" data-vista="largada">Largada</button>
+        <button class="bt-cena" type="button" data-vista="escala">Escala</button>
+        <button class="bt-cena" type="button" data-vista="cronometro">Cronômetro</button>
+      </div>
+      <div class="grupo-bt" role="group" aria-label="Tempo da simulação">
+        <button class="bt-cena" type="button" id="bt-pausa" aria-pressed="false">⏸ Pausar</button>
+        <button class="bt-cena" type="button" id="bt-velocidade" title="Velocidade da simulação">1×</button>
+      </div>
+    </div>
+
+    <div class="exp-barra base">
+      <button class="bt-cena principal" type="button" id="bt-soltar">Soltar o carrinho</button>
+    </div>
+
+    <p class="exp-dica">
+      Clique no carrinho para soltá-lo. As fotoportas podem ser arrastadas ao longo do trilho.
+      No cronômetro, o botão CANAL troca o sensor mostrado no visor.
+    </p>
+  </section>
+
+  <!-- ═══ PAINEL ═══ -->
+  <aside class="exp-painel" id="painel">
+    <nav class="exp-abas" role="tablist">
+      <button type="button" role="tab" data-aba="montagem">Montagem</button>
+      <button type="button" role="tab" data-aba="medidas">Medidas</button>
+      <button type="button" role="tab" data-aba="roteiro">Roteiro</button>
+    </nav>
+
+    <div class="exp-conteudo">
+
+      <!-- Montagem -->
+      <div data-painel="montagem">
+        <div class="secao">
+          <h3>Trilho e carrinho</h3>
+          <div id="ctl-montagem"></div>
+        </div>
+        <div class="secao">
+          <h3>Fotoportas (posição na escala do trilho)</h3>
+          <div id="ctl-sensores"></div>
+        </div>
+        <div class="secao">
+          <h3>Leituras da montagem</h3>
+          <dl class="leitura">
+            <dt>Inclinação θ do trilho</dt><dd id="lei-angulo">—</dd>
+            <dt>Massa do carrinho (balança)</dt><dd id="lei-massa">—</dd>
+            <dt>Bandeira na largada (escala)</dt><dd id="lei-largada">—</dd>
+            <dt>d até a fotoporta 1</dt><dd id="lei-d1">—</dd>
+            <dt>d até a fotoporta 2</dt><dd id="lei-d2">—</dd>
+            <dt>d até a fotoporta 3</dt><dd id="lei-d3">—</dd>
+            <dt>d até a fotoporta 4</dt><dd id="lei-d4">—</dd>
+          </dl>
+        </div>
+        <div class="secao">
+          <h3>Simulação</h3>
+          <div id="ctl-simulacao"></div>
+          <dl class="leitura" id="lei-modelo" hidden>
+            <dt>g · sen θ (bloco sem atrito)</dt><dd id="lei-aideal">—</dd>
+            <dt>a prevista para este carrinho</dt><dd id="lei-acarro">—</dd>
+          </dl>
+        </div>
+      </div>
+
+      <!-- Medidas -->
+      <div data-painel="medidas" hidden>
+        <div class="secao">
+          <h3>Cronômetro (tempo desde a largada)</h3>
+          <dl class="leitura">
+            <dt>Sensor 1</dt><dd id="lei-t1">—</dd>
+            <dt>Sensor 2</dt><dd id="lei-t2">—</dd>
+            <dt>Sensor 3</dt><dd id="lei-t3">—</dd>
+            <dt>Sensor 4</dt><dd id="lei-t4">—</dd>
+          </dl>
+          <div class="linha-bts">
+            <button class="bt cheio" type="button" id="bt-registrar">Registrar na tabela</button>
+            <button class="bt" type="button" id="bt-zerar">Zerar</button>
+          </div>
+        </div>
+
+        <div class="secao">
+          <h3>Tabela</h3>
+          <div id="tabela"></div>
+          <div class="linha-bts">
+            <button class="bt" type="button" id="bt-csv">Baixar CSV</button>
+            <button class="bt" type="button" id="bt-limpar">Limpar tabela</button>
+          </div>
+        </div>
+
+        <div class="secao">
+          <h3 class="simb" id="titulo-grafico-d">d em função de t²</h3>
+          <div id="grafico-d"></div>
+          <p class="resultado-ajuste" id="ajuste-d">Registre ao menos dois pontos com a inclinação atual para ver a reta.</p>
+        </div>
+
+        <div class="secao">
+          <h3 class="simb">a em função de sen θ</h3>
+          <div id="grafico-a"></div>
+          <p class="resultado-ajuste" id="ajuste-a">Meça com pelo menos duas inclinações diferentes para ver esta reta.</p>
+        </div>
+      </div>
+
+      <!-- Roteiro -->
+      <div data-painel="roteiro" hidden>
+        <article class="roteiro">
+          <h2>Plano inclinado de Galileu</h2>
+
+          <p>
+            Uma pedra solta de um metro de altura chega ao chão em menos de meio segundo, rápido
+            demais para os relógios que Galileu tinha. A saída que ele descreveu em 1638 foi diluir a
+            queda: uma esfera de bronze rolando num canal aberto numa viga de madeira, pouco inclinada,
+            e o tempo medido pela água que escorria de um recipiente. Neste experimento você vai
+            repetir a ideia com um carrinho, quatro fotoportas e um cronômetro de décimos de milésimo
+            de segundo.
+          </p>
+          <p>
+            O roteiro tem duas partes. Na primeira, com a inclinação fixa, você vai verificar como o
+            deslocamento cresce com o tempo e obter a aceleração. Na segunda, vai repetir a medida em
+            várias inclinações e, a partir delas, estimar a aceleração da gravidade.
+          </p>
+
+          <h3>1. O modelo</h3>
+          <p>
+            Um corpo que parte do repouso com <b>aceleração constante</b> percorre um deslocamento d
+            que cresce com o quadrado do tempo t:
+          </p>
+          <p class="formula">d = a · t² / 2</p>
+          <p>
+            Assim, o gráfico de d em função de t² é uma reta que passa pela origem, e a inclinação
+            dessa reta vale a / 2. Para um bloco que desliza sem atrito numa rampa de inclinação θ, a
+            aceleração a vale g · sen θ, em que g é a aceleração da gravidade. Cabe perceber que o
+            carrinho não é um bloco: as rodas giram, e isso tem consequência que o item 6 explica.
+          </p>
+
+          <h3>2. Procedimento</h3>
+          <ol>
+            <li>
+              Na aba Montagem, deixe a inclinação em 4° e posicione as quatro fotoportas. O painel
+              mostra a leitura da escala do trilho em cada uma e o deslocamento d desde a borda da
+              bandeira do carrinho na largada.
+            </li>
+            <li>
+              Clique em Soltar. O eletroímã libera o carrinho e, no mesmo instante, o cronômetro
+              começa a contar; cada sensor guarda o tempo em que a bandeira interrompeu o seu feixe.
+            </li>
+            <li>
+              Na aba Medidas, registre os quatro tempos. Volte o carrinho ao eletroímã, mude as
+              fotoportas de lugar e repita até ter pelo menos oito pontos.
+            </li>
+            <li>
+              Para a segunda parte, meça com pelo menos quatro inclinações entre 2° e 15°.
+            </li>
+          </ol>
+
+          <h3>3. Da reta à aceleração</h3>
+          <p>
+            O primeiro gráfico da aba Medidas mostra d em função de t², usando só os pontos da
+            inclinação atual. Se a aceleração é constante, os pontos se alinham numa reta que passa
+            perto da origem. A inclinação dessa reta vezes 2 é a aceleração do carrinho. A tabela
+            também calcula a = 2 · d / t² para cada ponto, o que permite comparar as fotoportas uma a
+            uma.
+          </p>
+
+          <h3>4. Da inclinação ao valor de g</h3>
+          <p>
+            Se a = g · sen θ, o gráfico de a em função de sen θ é uma reta de inclinação g. O segundo
+            gráfico usa todos os pontos da tabela e mostra essa reta. O valor que ela fornece costuma
+            sair um pouco abaixo de 9,8 m/s², e o motivo é o assunto da pergunta 4.
+          </p>
+
+          <h3>5. Perguntas</h3>
+          <ol>
+            <li>Os pontos de d em função de t² ficaram alinhados? O que isso diz sobre a aceleração ao longo do trilho?</li>
+            <li>Por que Galileu precisava de um plano pouco inclinado, e não de um muito inclinado?</li>
+            <li>Ponha carga sobre o carrinho, sem mudar a inclinação. A aceleração mudou? Em quanto?</li>
+            <li>O g obtido no segundo gráfico ficou abaixo do valor esperado. Liste duas causas possíveis e diga qual delas a pergunta 3 ajuda a identificar.</li>
+            <li>A reta de a em função de sen θ não passa exatamente pela origem. O que significa a aceleração ser zero com sen θ um pouco maior que zero?</li>
+          </ol>
+
+          <h3>6. O que a simulação leva em conta</h3>
+          <p>
+            O movimento inclui três efeitos que afastam o carrinho do bloco ideal. O primeiro são as
+            rodas: parte da energia vai para fazê-las girar, o que reduz a aceleração em alguns por
+            cento, e o efeito diminui quando o carrinho fica mais pesado, porque as rodas passam a ser
+            uma fração menor do total. O segundo é a resistência ao rolamento, que funciona como um
+            atrito pequeno. O terceiro é o ar, que freia o carrinho de modo proporcional ao quadrado
+            da velocidade e só aparece nas fotoportas mais distantes. O eletroímã solta o carrinho
+            sem atraso, e cada sensor tem resolução de 0,1 ms.
+          </p>
+        </article>
+      </div>
+
+    </div>
+  </aside>
+</main>
+
+<script type="module" src="plano-inclinado.js"></script>
+<script src="/js/feedback-modal.js"></script>
+</body>
+</html>

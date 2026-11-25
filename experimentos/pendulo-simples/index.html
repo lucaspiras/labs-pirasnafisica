@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="/js/theme.js"></script>
+  <link rel="icon" type="image/png" sizes="32x32" href="/img/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/img/icons/favicon-16.png">
+  <link rel="apple-touch-icon" href="/img/icons/apple-touch-icon.png">
+  <meta name="description" content="Experimento do pêndulo simples em 3D: meça o período com cronômetro e fotoporta, monte o gráfico de T² em função de L e determine a aceleração da gravidade.">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Pêndulo simples — Laboratório — Piras na Física">
+  <meta property="og:description" content="Meça o período de um pêndulo com cronômetro e fotoporta e determine a aceleração da gravidade.">
+  <meta property="og:image" content="https://pirasnafisica.com.br/img/og-logo.jpg">
+  <meta property="og:locale" content="pt_BR">
+  <meta property="og:url" content="https://labs.pirasnafisica.com.br/experimentos/pendulo-simples/">
+  <title>Pêndulo simples — Piras na Física</title>
+
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-TY56KM22X8"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-TY56KM22X8');
+  </script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600;700&family=Playfair+Display:wght@700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../motor/estilo.css">
+
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "/experimentos/vendor/three/three.module.min.js",
+      "three/addons/": "/experimentos/vendor/three/addons/"
+    }
+  }
+  </script>
+</head>
+<body>
+
+<header class="site-header">
+  <a href="https://pirasnafisica.com.br/" class="logo-link">
+    <img src="/img/novo_logo_final.png" alt="Piras na Física" class="logo-img">
+    <div class="logo-text">
+      Pêndulo simples
+      <span>Laboratório · Piras na Física</span>
+    </div>
+  </a>
+  <div class="header-badges">
+    <a class="header-badge opcional" href="/experimentos/">← Experimentos</a>
+    <button class="header-badge" type="button" onclick="FeedbackModal.open()">💬 Sua opinião</button>
+    <button class="header-badge" type="button" id="theme-toggle" aria-label="Alternar tema claro e escuro">🌙</button>
+  </div>
+</header>
+
+<main class="exp">
+
+  <!-- ═══ CENA 3D ═══ -->
+  <section class="exp-cena" id="cena" aria-label="Montagem do pêndulo em três dimensões. Arraste para girar a vista.">
+    <div class="exp-barra topo">
+      <div class="grupo-bt" role="group" aria-label="Vistas">
+        <button class="bt-cena" type="button" data-vista="inicial">Inicial</button>
+        <button class="bt-cena" type="button" data-vista="frente">Frente</button>
+        <button class="bt-cena" type="button" data-vista="lado">Lado</button>
+        <button class="bt-cena" type="button" data-vista="cima">Cima</button>
+        <button class="bt-cena" type="button" data-vista="transferidor">Transferidor</button>
+        <button class="bt-cena" type="button" data-vista="instrumentos">Instrumentos</button>
+      </div>
+      <div class="grupo-bt" role="group" aria-label="Tempo da simulação">
+        <button class="bt-cena" type="button" id="bt-pausa" aria-pressed="false">⏸ Pausar</button>
+        <button class="bt-cena" type="button" id="bt-velocidade" title="Velocidade da simulação">1×</button>
+      </div>
+    </div>
+
+    <div class="exp-barra base">
+      <button class="bt-cena principal" type="button" id="bt-soltar">Soltar</button>
+      <button class="bt-cena" type="button" id="bt-cron">⏱ Iniciar cronômetro</button>
+    </div>
+
+    <p class="exp-dica">
+      Arraste a esfera para afastá-la da vertical. Arraste o fundo para girar a vista,
+      a roda do mouse aproxima, o botão direito desloca. <kbd>Espaço</kbd> liga e para o cronômetro.
+    </p>
+  </section>
+
+  <!-- ═══ PAINEL ═══ -->
+  <aside class="exp-painel" id="painel">
+    <nav class="exp-abas" role="tablist">
+      <button type="button" role="tab" data-aba="montagem">Montagem</button>
+      <button type="button" role="tab" data-aba="medidas">Medidas</button>
+      <button type="button" role="tab" data-aba="roteiro">Roteiro</button>
+    </nav>
+
+    <div class="exp-conteudo">
+
+      <!-- Montagem -->
+      <div data-painel="montagem">
+        <div class="secao">
+          <h3>Pêndulo</h3>
+          <div id="ctl-montagem"></div>
+        </div>
+        <div class="secao">
+          <h3>Leituras da montagem</h3>
+          <dl class="leitura">
+            <dt>Comprimento do fio (trena)</dt><dd id="lei-fio">—</dd>
+            <dt>Diâmetro da esfera (paquímetro)</dt><dd id="lei-diametro">—</dd>
+            <dt>L = fio + raio</dt><dd id="lei-L">—</dd>
+            <dt>Ângulo inicial (transferidor)</dt><dd id="lei-angulo">—</dd>
+          </dl>
+        </div>
+        <div class="secao">
+          <h3>Simulação</h3>
+          <div id="ctl-simulacao"></div>
+          <dl class="leitura" id="lei-modelo" hidden>
+            <dt>T previsto, ângulo pequeno</dt><dd id="lei-T0">—</dd>
+            <dt>T previsto, nesta amplitude</dt><dd id="lei-Tamp">—</dd>
+          </dl>
+        </div>
+      </div>
+
+      <!-- Medidas -->
+      <div data-painel="medidas" hidden>
+        <div class="secao">
+          <h3>Cronômetro</h3>
+          <dl class="leitura">
+            <dt>Leitura</dt><dd id="lei-cron">00:00,00</dd>
+          </dl>
+          <div class="linha-bts">
+            <button class="bt cheio" type="button" id="bt-cron2">Iniciar</button>
+            <button class="bt" type="button" id="bt-cron-zerar">Zerar</button>
+          </div>
+          <label class="campo-num" style="margin-top:10px">Oscilações contadas
+            <input type="number" id="n-osc" min="1" max="100" value="10">
+          </label>
+          <button class="bt" type="button" id="bt-reg-cron">Registrar na tabela</button>
+        </div>
+
+        <div class="secao">
+          <h3>Fotoporta</h3>
+          <dl class="leitura">
+            <dt>Último período</dt><dd id="lei-foto">—</dd>
+          </dl>
+          <div class="linha-bts">
+            <button class="bt" type="button" id="bt-reg-foto">Registrar na tabela</button>
+            <button class="bt" type="button" id="bt-foto-zerar">Zerar</button>
+          </div>
+        </div>
+
+        <div class="secao">
+          <h3>Tabela</h3>
+          <div id="tabela"></div>
+          <div class="linha-bts">
+            <button class="bt" type="button" id="bt-csv">Baixar CSV</button>
+            <button class="bt" type="button" id="bt-limpar">Limpar tabela</button>
+          </div>
+        </div>
+
+        <div class="secao">
+          <h3 class="simb">Gráfico de T² em função de L</h3>
+          <div id="grafico"></div>
+          <p class="resultado-ajuste" id="ajuste">Registre ao menos dois comprimentos diferentes para ver a reta.</p>
+        </div>
+      </div>
+
+      <!-- Roteiro -->
+      <div data-painel="roteiro" hidden>
+        <article class="roteiro">
+          <h2>Pêndulo simples</h2>
+
+          <p>
+            Neste experimento você vai medir o período de um pêndulo para vários comprimentos
+            e, a partir dessas medidas, determinar a aceleração da gravidade no laboratório.
+            Ao longo do caminho, vai testar duas afirmações que aparecem em todo livro: a de que
+            o período não depende da massa e a de que não depende da amplitude. Uma delas tem
+            prazo de validade.
+          </p>
+
+          <h3>1. O modelo</h3>
+          <p>
+            O <b>período</b> T é o tempo de uma oscilação completa, ida e volta. Para um pêndulo
+            de comprimento L, num lugar onde a gravidade vale g, o modelo do pêndulo simples prevê
+          </p>
+          <p class="formula">T = 2π · √(L / g)</p>
+          <p>
+            O comprimento L vai do ponto de suspensão até o <i>centro</i> da esfera, e não até o
+            nó do fio. Cabe perceber que a fórmula só vale para oscilações de amplitude pequena,
+            algo em torno de 10° ou menos. O item 5 do procedimento mostra o que acontece além disso.
+          </p>
+
+          <h3>2. Procedimento</h3>
+          <ol>
+            <li>
+              Na aba Montagem, escolha o comprimento do fio e a massa. O painel mostra a leitura
+              da trena e a do paquímetro; some o comprimento do fio com o raio da esfera para obter L.
+              Se quiser conferir, aproxime a câmera da trena e leia onde fica o centro da esfera.
+            </li>
+            <li>
+              Arraste a esfera para o lado até cerca de 10°, lendo o ângulo no transferidor
+              (o botão "Transferidor" aproxima a vista), e clique em Soltar.
+            </li>
+            <li>
+              Ligue o cronômetro quando a esfera passar pelo ponto mais baixo e desligue depois de
+              contar 10 oscilações completas. Divida o tempo por 10. Registre na tabela.
+            </li>
+            <li>
+              Repita para pelo menos cinco comprimentos entre 0,30 m e 1,40 m. Na aba Medidas,
+              o gráfico de T² em função de L aparece sozinho.
+            </li>
+            <li>
+              Com um comprimento fixo, solte de 10°, 30° e 60° e anote o período que a fotoporta mede.
+            </li>
+          </ol>
+
+          <h3>3. Da reta ao valor de g</h3>
+          <p>
+            Elevando ao quadrado os dois lados do modelo, obtém-se T² = (4π² / g) · L. O gráfico de
+            T² em função de L deve ser, portanto, uma reta que passa pela origem, com inclinação
+            a = 4π² / g. Isolando, <b>g = 4π² / a</b>. O painel calcula a inclinação da reta que
+            melhor se ajusta aos seus pontos e o valor de g que ela fornece.
+          </p>
+
+          <h3>4. Por que contar 10 oscilações</h3>
+          <p>
+            Nesta simulação o tempo de reação que entra na medida é o seu: o cronômetro liga e
+            desliga quando você aperta. Esse atraso fica em torno de 0,2 s no início e outro tanto
+            no fim, e não diminui quando o intervalo medido aumenta. Medindo 10 períodos de uma vez,
+            o mesmo erro fica dividido por 10. A fotoporta não tem esse problema, porque é o próprio
+            pêndulo que interrompe o feixe de luz.
+          </p>
+
+          <h3>5. Perguntas</h3>
+          <ol>
+            <li>Por que o gráfico de T² em função de L é uma reta, e o de T em função de L não é?</li>
+            <li>Troque a massa mantendo o comprimento. O período mudou? O que isso diz sobre o papel da massa no movimento?</li>
+            <li>Compare os períodos medidos pela fotoporta a 10°, 30° e 60°. A partir de que ângulo a diferença em relação ao de 10° passa de 1 %?</li>
+            <li>Compare o g obtido com o cronômetro e com a fotoporta. Qual fonte de erro pesa mais em cada caso?</li>
+            <li>Deixe o pêndulo oscilando por alguns minutos. A amplitude diminui; e o período?</li>
+          </ol>
+
+          <h3>6. O que a simulação leva em conta</h3>
+          <p>
+            O movimento é calculado pela equação completa do pêndulo, sem a aproximação de ângulo
+            pequeno, e inclui a resistência do ar sobre a esfera. A esfera é tratada como um corpo
+            de tamanho real, e não como um ponto, o que deixa o período maior que o do pêndulo ideal
+            por algo entre um décimo de milésimo e um milésimo de segundo, conforme o comprimento e a
+            esfera. A fotoporta consegue enxergar essa diferença. O fio é considerado sem massa e inextensível,
+            e o suporte, rígido.
+          </p>
+        </article>
+      </div>
+
+    </div>
+  </aside>
+</main>
+
+<script type="module" src="pendulo-simples.js"></script>
+<script src="/js/feedback-modal.js"></script>
+</body>
+</html>
