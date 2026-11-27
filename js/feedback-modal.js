@@ -5,8 +5,8 @@
  */
 
 const FeedbackModal = (() => {
-  const SUPABASE_URL = 'https://vlihugczatpmnyjbdmqw.supabase.co';
-  const SUPABASE_KEY = 'sb_publishable__QOgJ-nSBouPG9kcbpjcAA_MrcVuNqX';
+  const SUPABASE_URL = 'https://zmbgprapzgvpnmbtrakp.supabase.co';
+  const SUPABASE_KEY = 'sb_publishable_Zh1Kq8RsRjK1OUiGsVTVkw_AhkMK275';
 
   let supabaseClient = null;
 
@@ -279,7 +279,7 @@ const FeedbackModal = (() => {
 
   function waitForSupabase(resolve, reject, attempts = 0) {
     if (window.supabase) {
-      supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+      supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY, { db: { schema: 'site' } });
       resolve();
     } else if (attempts < 20) {
       setTimeout(() => waitForSupabase(resolve, reject, attempts + 1), 100);
