@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="/js/theme.js"></script>
+  <link rel="icon" type="image/png" sizes="32x32" href="/img/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/img/icons/favicon-16.png">
+  <link rel="apple-touch-icon" href="/img/icons/apple-touch-icon.png">
+  <meta name="description" content="Pêndulo balístico em 3D: lançador de mola, fotoporta, catraca, transferidor e régua. Meça a velocidade da bola por dois caminhos e quanto da energia cinética se dissipa no choque.">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Pêndulo balístico — Laboratório — Piras na Física">
+  <meta property="og:description" content="A velocidade de uma bola medida pela altura que o pêndulo sobe, e a energia que some no choque.">
+  <meta property="og:image" content="https://pirasnafisica.com.br/img/og-logo.jpg">
+  <meta property="og:locale" content="pt_BR">
+  <meta property="og:url" content="https://labs.pirasnafisica.com.br/experimentos/pendulo-balistico/">
+  <title>Pêndulo balístico — Piras na Física</title>
+
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-TY56KM22X8"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-TY56KM22X8');
+  </script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600;700&family=Playfair+Display:wght@700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../motor/estilo.css">
+
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "/experimentos/vendor/three/three.module.min.js",
+      "three/addons/": "/experimentos/vendor/three/addons/"
+    }
+  }
+  </script>
+</head>
+<body>
+
+<header class="site-header">
+  <a href="https://pirasnafisica.com.br/" class="logo-link">
+    <img src="/img/novo_logo_final.png" alt="Piras na Física" class="logo-img">
+    <div class="logo-text">
+      Pêndulo balístico
+      <span>Laboratório · Piras na Física</span>
+    </div>
+  </a>
+  <div class="header-badges">
+    <a class="header-badge opcional" href="/experimentos/">← Experimentos</a>
+    <button class="header-badge" type="button" onclick="FeedbackModal.open()">💬 Sua opinião</button>
+    <button class="header-badge" type="button" id="theme-toggle" aria-label="Alternar tema claro e escuro">🌙</button>
+  </div>
+</header>
+
+<main class="exp">
+
+  <!-- ═══ CENA 3D ═══ -->
+  <section class="exp-cena" id="cena" aria-label="Pêndulo balístico e lançador de mola em três dimensões. Arraste para girar a vista.">
+    <div class="exp-barra topo">
+      <div class="grupo-bt" role="group" aria-label="Vistas">
+        <button class="bt-cena" type="button" data-vista="inicial">Inicial</button>
+        <button class="bt-cena" type="button" data-vista="frente">Frente</button>
+        <button class="bt-cena" type="button" data-vista="cima">Cima</button>
+        <button class="bt-cena" type="button" data-vista="lancador">Lançador</button>
+        <button class="bt-cena" type="button" data-vista="transferidor">Transferidor</button>
+        <button class="bt-cena" type="button" data-vista="regua">Régua</button>
+      </div>
+      <div class="grupo-bt" role="group" aria-label="Tempo da simulação">
+        <button class="bt-cena" type="button" id="bt-pausa" aria-pressed="false">⏸ Pausar</button>
+        <button class="bt-cena" type="button" id="bt-velocidade" title="Velocidade da simulação">1×</button>
+      </div>
+    </div>
+
+    <div class="exp-barra base">
+      <button class="bt-cena principal" type="button" id="bt-disparar">Disparar</button>
+    </div>
+
+    <p class="exp-dica">
+      Clique no lançador para disparar. A catraca segura o pêndulo no ponto mais alto; clique
+      nele para liberar e recarregar. A câmera lenta (¼×) deixa ver a bola entrando no captador.
+    </p>
+  </section>
+
+  <!-- ═══ PAINEL ═══ -->
+  <aside class="exp-painel" id="painel">
+    <nav class="exp-abas" role="tablist">
+      <button type="button" role="tab" data-aba="montagem">Montagem</button>
+      <button type="button" role="tab" data-aba="medidas">Medidas</button>
+      <button type="button" role="tab" data-aba="roteiro">Roteiro</button>
+    </nav>
+
+    <div class="exp-conteudo">
+
+      <!-- Montagem -->
+      <div data-painel="montagem">
+        <div class="secao">
+          <h3>Bola, pêndulo e lançador</h3>
+          <div id="ctl-montagem"></div>
+        </div>
+        <div class="secao">
+          <h3>Leituras da montagem</h3>
+          <dl class="leitura">
+            <dt>Massa da bola, m (balança)</dt><dd id="lei-m">—</dd>
+            <dt>Diâmetro da bola, d (paquímetro)</dt><dd id="lei-d">—</dd>
+            <dt>Massa do pêndulo sem a bola, M (balança)</dt><dd id="lei-M">—</dd>
+            <dt>Do eixo ao centro de massa, com a bola, r<sub>cm</sub> (régua)</dt><dd id="lei-rcm">—</dd>
+            <dt>Gravidade local, g</dt><dd id="lei-g">—</dd>
+          </dl>
+        </div>
+        <div class="secao">
+          <h3>Simulação</h3>
+          <div id="ctl-simulacao"></div>
+          <dl class="leitura" id="lei-modelo" hidden>
+            <dt>Velocidade média de saída nesta posição</dt><dd id="lei-vprev">—</dd>
+            <dt>E<sub>c</sub> que sobra no choque, modelo do livro, m / (m + M)</dt><dd id="lei-frac-simples">—</dd>
+            <dt>E<sub>c</sub> que sobra no choque, pêndulo real</dt><dd id="lei-frac">—</dd>
+            <dt>Momento de inércia do pêndulo com a bola, I</dt><dd id="lei-I">—</dd>
+          </dl>
+        </div>
+      </div>
+
+      <!-- Medidas -->
+      <div data-painel="medidas" hidden>
+        <div class="secao">
+          <h3>Fotoporta</h3>
+          <dl class="leitura">
+            <dt>Tempo de bloqueio, t</dt><dd id="lei-tb">—</dd>
+            <dt>Velocidade da bola, v = d / t</dt><dd id="lei-v">—</dd>
+          </dl>
+        </div>
+
+        <div class="secao">
+          <h3>Pêndulo</h3>
+          <dl class="leitura">
+            <dt>Ângulo na catraca, θ (transferidor)</dt><dd id="lei-theta">—</dd>
+            <dt>Altura do centro de massa em repouso, h<sub>mín</sub> (régua)</dt><dd id="lei-hmin">—</dd>
+            <dt>Altura do centro de massa no ponto mais alto, h<sub>máx</sub> (régua)</dt><dd id="lei-hmax">—</dd>
+            <dt>Subida pela régua, h<sub>máx</sub> − h<sub>mín</sub></dt><dd id="lei-dh">—</dd>
+            <dt>Subida pelo ângulo, r<sub>cm</sub> · (1 − cos θ)</dt><dd id="lei-hang">—</dd>
+          </dl>
+          <div class="linha-bts">
+            <button class="bt cheio" type="button" id="bt-registrar">Registrar o disparo</button>
+          </div>
+        </div>
+
+        <div class="secao">
+          <h3>Tabela</h3>
+          <div id="tabela"></div>
+          <p class="tab-vazio" style="padding-top:4px">
+            A coluna h vem do ângulo. Para usar a régua, digite nela h<sub>máx</sub> − h<sub>mín</sub>
+            em metros. O apóstrofo indica a velocidade logo depois do choque, e E<sub>c</sub> depois
+            é calculada como (m + M) · g · h.
+          </p>
+          <div class="linha-bts">
+            <button class="bt" type="button" id="bt-csv">Baixar CSV</button>
+            <button class="bt" type="button" id="bt-limpar">Limpar tabela</button>
+          </div>
+        </div>
+
+        <div class="secao">
+          <h3 class="simb">Velocidade pelo pêndulo em função da velocidade pela fotoporta</h3>
+          <div id="grafico-v"></div>
+          <p class="resultado-ajuste" id="ajuste-v">Registre ao menos dois disparos para ver a reta.</p>
+        </div>
+
+        <div class="secao">
+          <h3 class="simb">Fração da E<sub>c</sub> que sobra em função de m / (m + M)</h3>
+          <div id="grafico-e"></div>
+          <p class="resultado-ajuste" id="ajuste-e">Registre disparos com pelo menos duas combinações de bola e massas para ver a reta.</p>
+        </div>
+      </div>
+
+      <!-- Roteiro -->
+      <div data-painel="roteiro" hidden>
+        <article class="roteiro">
+          <h2>Pêndulo balístico</h2>
+
+          <p>
+            O pêndulo balístico foi inventado em 1742 por Benjamin Robins para medir a velocidade
+            de balas de canhão, rápidas demais para qualquer relógio da época. A ideia é disparar o
+            projétil contra um bloco pendurado, que o retém e sobe. Pela altura da subida, calcula-se
+            a velocidade. Neste experimento você vai fazer essa medida, conferi-la com uma fotoporta
+            e descobrir quanta energia cinética desaparece no choque. Primeiro vem o modelo, depois
+            as duas formas de medir a altura, e por fim o procedimento.
+          </p>
+
+          <h3>1. O modelo, em duas etapas</h3>
+          <p>
+            O movimento se divide em duas etapas, e cada uma obedece a uma lei de conservação
+            diferente. A primeira é o <b>choque</b>: a bola de massa m, com velocidade v, entra no
+            captador do pêndulo de massa M e fica presa. O choque dura tão pouco que o pêndulo ainda
+            não saiu do lugar, e a quantidade de movimento Q = m · v se conserva:
+          </p>
+          <p class="formula">m · v = (m + M) · v′</p>
+          <p>
+            O apóstrofo indica a velocidade do conjunto logo depois do choque. A segunda etapa é a
+            <b>subida</b>. Agora quem se conserva é a energia mecânica: a energia cinética do conjunto
+            vira energia potencial gravitacional, e o centro de massa sobe uma altura h.
+          </p>
+          <p class="formula">(m + M) · v′² / 2 = (m + M) · g · h &nbsp;⇒&nbsp; v′ = √(2 · g · h)</p>
+          <p>Juntando as duas etapas, chega-se à velocidade da bola:</p>
+          <p class="formula">v = (m + M) / m · √(2 · g · h)</p>
+          <p>
+            Cabe perceber que cada lei vale só na sua etapa. Igualar a energia cinética da bola
+            antes do choque à energia potencial do pêndulo no alto é um <b>erro frequente</b>, e dá
+            uma velocidade muito menor que a verdadeira, porque a maior parte da energia cinética
+            some no choque. O item 4 mostra quanto.
+          </p>
+
+          <h3>2. Duas maneiras de medir h</h3>
+          <p>
+            A altura que entra na fórmula é a subida do <i>centro de massa</i> do conjunto, marcado no
+            pêndulo pelo símbolo de quadrantes pretos e brancos. A primeira maneira é ler na régua
+            vertical a altura dessa marca em repouso, h<sub>mín</sub>, e no ponto mais alto,
+            h<sub>máx</sub>, e fazer a diferença. A catraca ajuda: os dentes do arco seguram o
+            pêndulo lá em cima, e dá tempo de aproximar a câmera e ler.
+          </p>
+          <p>
+            A segunda maneira usa o ângulo θ lido no transferidor e a distância r<sub>cm</sub> do eixo
+            ao centro de massa. A geometria do triângulo dá
+          </p>
+          <p class="formula">h = r<sub>cm</sub> · (1 − cos θ)</p>
+          <p>
+            A régua tem resolução de 1 mm, e o transferidor, de meio grau. Para subidas grandes as duas
+            maneiras concordam; para subidas de poucos milímetros, uma delas fica muito pior que a outra.
+            A pergunta 3 pede que você descubra qual.
+          </p>
+
+          <h3>3. A medida direta, com a fotoporta</h3>
+          <p>
+            Na boca do lançador há uma fotoporta. Ela mede o tempo t em que a bola bloqueia o feixe, e a
+            velocidade é o diâmetro da bola dividido por esse tempo, <b>v = d / t</b>. É essa medida
+            que serve de referência para avaliar o pêndulo. O contador tem resolução de 10 µs, o que
+            mantém o erro abaixo de 0,5 % mesmo na bola mais rápida.
+          </p>
+
+          <h3>4. Para onde vai a energia</h3>
+          <p>
+            A energia cinética da bola antes do choque é E<sub>c</sub> = m · v² / 2. Logo depois do choque,
+            o conjunto tem (m + M) · v′² / 2, que é o mesmo que (m + M) · g · h. Combinando com a
+            conservação da quantidade de movimento, a fração da energia que sobra fica
+          </p>
+          <p class="formula">E<sub>c</sub> depois / E<sub>c</sub> antes = m / (m + M)</p>
+          <p>
+            Com a bola de aço e o pêndulo sem massas adicionais, sobram perto de 28 %. O resto vira calor,
+            som e deformação da mola que segura a bola dentro do captador. Com a bola de náilon,
+            sobram cerca de 5 %. O choque é perfeitamente inelástico, e nenhum choque perde mais energia
+            cinética do que esse sem violar a conservação da quantidade de movimento.
+          </p>
+
+          <h3>5. Procedimento</h3>
+          <ol>
+            <li>
+              Na aba Montagem, escolha a bola de aço, nenhuma massa adicional e a posição média do
+              lançador. Anote m, M e r<sub>cm</sub>.
+            </li>
+            <li>
+              Dispare. Quando a catraca travar, leia o ângulo no transferidor e a altura da marca do
+              centro de massa na régua (os botões Transferidor e Régua aproximam a vista). Compare com as
+              leituras da aba Medidas e registre o disparo.
+            </li>
+            <li>Libere a catraca e repita três vezes na mesma posição, para ver a variação de um disparo a outro.</li>
+            <li>Repita nas posições curta e longa, e depois com uma e com duas massas adicionais.</li>
+            <li>Troque para a bola de náilon e faça a mesma série.</li>
+          </ol>
+
+          <h3>6. Perguntas</h3>
+          <ol>
+            <li>Que fração da energia cinética da bola se dissipou no choque em cada montagem? Compare com M / (m + M).</li>
+            <li>
+              Calcule a velocidade da bola igualando m · v² / 2 a (m + M) · g · h, isto é, usando
+              conservação de energia desde o disparo. Quanto esse valor erra em relação ao da fotoporta?
+            </li>
+            <li>
+              Para a bola de náilon com duas massas adicionais, compare a subida pela régua e pelo
+              ângulo. Qual das duas dá a velocidade mais próxima da fotoporta? Por quê?
+            </li>
+            <li>
+              Ao travar, a lingueta da catraca escorrega de volta até o último dente que passou. Esse
+              efeito faz a velocidade calculada sair maior ou menor que a verdadeira?
+            </li>
+            <li>
+              No gráfico das velocidades, os pontos de cada montagem caem em retas de inclinação
+              ligeiramente diferente, umas acima de 1 e outras abaixo. O item 7 explica a razão;
+              antes de lê-lo, tente adivinhar o que muda de uma montagem para outra.
+            </li>
+          </ol>
+
+          <h3>7. O que a simulação leva em conta</h3>
+          <p>
+            O pêndulo é um corpo rígido feito de partes: haste de 35 g, captador de 140 g e as massas de
+            50 g presas embaixo. No choque, quem se conserva em torno do eixo é o <i>momento angular</i>,
+            m · v · R = I · ω, com R = 280 mm a distância do eixo à linha do voo da bola e I o momento de
+            inércia do conjunto. O modelo do item 1 trata o pêndulo como um ponto, e só é exato quando
+            I = (m + M) · R², isto é, quando o conjunto gira como se toda a massa estivesse na altura
+            da bola. A haste, mais perto do eixo, deixa I menor que isso, e o modelo superestima a
+            velocidade; as massas adicionais, abaixo da bola, deixam I maior, e o modelo subestima. A
+            diferença fica entre −5 % e +6 %, conforme a montagem. Para quem
+            estuda corpo rígido, a fórmula sem aproximação é v = √(2 · I · (m + M) · g · h) / (m · R),
+            e o I aparece no painel quando o modelo está ligado.
+          </p>
+          <p>
+            Além disso, o lançador é uma mola comprimida 20, 30 ou 40 mm, que empurra a bola e o êmbolo
+            juntos; a velocidade varia cerca de 0,8 % de um disparo a outro. O atrito no eixo e na
+            lingueta tira da subida uma energia proporcional ao ângulo percorrido, que pesa pouco com a
+            bola de aço (menos de 1 %) e chega a 7 % nas subidas pequenas da bola de náilon. Os dentes da
+            catraca estão a cada meio grau. A gravidade vale 9,79 m/s².
+          </p>
+        </article>
+      </div>
+
+    </div>
+  </aside>
+</main>
+
+<script type="module" src="pendulo-balistico.js"></script>
+<script src="/js/feedback-modal.js"></script>
+</body>
+</html>

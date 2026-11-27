@@ -263,6 +263,37 @@ export function colisao(m1, v1, m2, v2, e) {
   ];
 }
 
+/* ───────────────────────── Pêndulo balístico ───────────────────────── */
+
+/**
+ * Corpo rígido que gira em torno de um eixo, montado por partes [{m, r, I0}]: r é a
+ * distância do eixo ao centro da parte e I0 o momento de inércia dela em torno do
+ * próprio centro. Devolve a massa, a distância do eixo ao centro de massa e o I total.
+ */
+export function corpoRigido(partes) {
+  let M = 0, mr = 0, I = 0;
+  for (const p of partes) {
+    M += p.m;
+    mr += p.m * p.r;
+    I += p.m * p.r * p.r + (p.I0 || 0);
+  }
+  return { M, rcm: mr / M, I };
+}
+
+/**
+ * Captura da bola pelo pêndulo: conservação do momento angular em torno do eixo,
+ * m·v·R = I·ω, com R a distância do eixo à linha do voo e I o do pêndulo já com a bola.
+ * Devolve ω logo depois do choque.
+ */
+export function capturaBalistica({ m, v, R, I }) {
+  return (m * v * R) / I;
+}
+
+/** Modelo do livro, pêndulo como ponto: v = (m + M)/m · √(2·g·h). */
+export function velocidadeBalistica(m, M, h, g = CONST.g) {
+  return ((m + M) / m) * Math.sqrt(2 * g * Math.max(0, h));
+}
+
 /* ───────────────────────── Ajuste ───────────────────────── */
 
 /** Regressão linear por mínimos quadrados: y = a·x + b. */
