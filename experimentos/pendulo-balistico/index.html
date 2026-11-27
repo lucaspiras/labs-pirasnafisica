@@ -7,7 +7,7 @@
   <link rel="icon" type="image/png" sizes="32x32" href="/img/icons/favicon-32.png">
   <link rel="icon" type="image/png" sizes="16x16" href="/img/icons/favicon-16.png">
   <link rel="apple-touch-icon" href="/img/icons/apple-touch-icon.png">
-  <meta name="description" content="Pêndulo balístico em 3D: lançador de mola, fotoporta, catraca, transferidor e régua. Meça a velocidade da bola por dois caminhos e quanto da energia cinética se dissipa no choque.">
+  <meta name="description" content="Pêndulo balístico em 3D: lançador de mola, seis bolas, cronógrafo, catraca, transferidor e régua. Meça a velocidade da bola por dois caminhos e quanto da energia cinética se dissipa no choque.">
   <meta property="og:type" content="website">
   <meta property="og:title" content="Pêndulo balístico — Laboratório — Piras na Física">
   <meta property="og:description" content="A velocidade de uma bola medida pela altura que o pêndulo sobe, e a energia que some no choque.">
@@ -65,6 +65,7 @@
         <button class="bt-cena" type="button" data-vista="frente">Frente</button>
         <button class="bt-cena" type="button" data-vista="cima">Cima</button>
         <button class="bt-cena" type="button" data-vista="lancador">Lançador</button>
+        <button class="bt-cena" type="button" data-vista="cronografo">Cronógrafo</button>
         <button class="bt-cena" type="button" data-vista="transferidor">Transferidor</button>
         <button class="bt-cena" type="button" data-vista="regua">Régua</button>
       </div>
@@ -79,8 +80,9 @@
     </div>
 
     <p class="exp-dica">
-      Clique no lançador para disparar. A catraca segura o pêndulo no ponto mais alto; clique
-      nele para liberar e recarregar. A câmera lenta (¼×) deixa ver a bola entrando no captador.
+      Clique no lançador para disparar, ou numa das palavras CURTO, MÉDIO e LONGO para escolher a
+      posição. A catraca segura o pêndulo no alto; clique nele para liberar. A câmera lenta (1/20×)
+      mostra o voo da bola.
     </p>
   </section>
 
@@ -104,8 +106,8 @@
           <h3>Leituras da montagem</h3>
           <dl class="leitura">
             <dt>Massa da bola, m (balança)</dt><dd id="lei-m">—</dd>
-            <dt>Diâmetro da bola, d (paquímetro)</dt><dd id="lei-d">—</dd>
             <dt>Massa do pêndulo sem a bola, M (balança)</dt><dd id="lei-M">—</dd>
+            <dt>Distância entre os feixes do cronógrafo, d (fabricante)</dt><dd id="lei-dc">—</dd>
             <dt>Do eixo ao centro de massa, com a bola, r<sub>cm</sub> (régua)</dt><dd id="lei-rcm">—</dd>
             <dt>Gravidade local, g</dt><dd id="lei-g">—</dd>
           </dl>
@@ -125,9 +127,9 @@
       <!-- Medidas -->
       <div data-painel="medidas" hidden>
         <div class="secao">
-          <h3>Fotoporta</h3>
+          <h3>Cronógrafo</h3>
           <dl class="leitura">
-            <dt>Tempo de bloqueio, t</dt><dd id="lei-tb">—</dd>
+            <dt>Tempo entre os dois feixes, t</dt><dd id="lei-tc">—</dd>
             <dt>Velocidade da bola, v = d / t</dt><dd id="lei-v">—</dd>
           </dl>
         </div>
@@ -161,7 +163,7 @@
         </div>
 
         <div class="secao">
-          <h3 class="simb">Velocidade pelo pêndulo em função da velocidade pela fotoporta</h3>
+          <h3 class="simb">Velocidade pelo pêndulo em função da velocidade pelo cronógrafo</h3>
           <div id="grafico-v"></div>
           <p class="resultado-ajuste" id="ajuste-v">Registre ao menos dois disparos para ver a reta.</p>
         </div>
@@ -182,7 +184,7 @@
             O pêndulo balístico foi inventado em 1742 por Benjamin Robins para medir a velocidade
             de balas de canhão, rápidas demais para qualquer relógio da época. A ideia é disparar o
             projétil contra um bloco pendurado, que o retém e sobe. Pela altura da subida, calcula-se
-            a velocidade. Neste experimento você vai fazer essa medida, conferi-la com uma fotoporta
+            a velocidade. Neste experimento você vai fazer essa medida, conferi-la com um cronógrafo
             e descobrir quanta energia cinética desaparece no choque. Primeiro vem o modelo, depois
             as duas formas de medir a altura, e por fim o procedimento.
           </p>
@@ -229,12 +231,19 @@
             A pergunta 3 pede que você descubra qual.
           </p>
 
-          <h3>3. A medida direta, com a fotoporta</h3>
+          <h3>3. A medida direta, com o cronógrafo</h3>
           <p>
-            Na boca do lançador há uma fotoporta. Ela mede o tempo t em que a bola bloqueia o feixe, e a
-            velocidade é o diâmetro da bola dividido por esse tempo, <b>v = d / t</b>. É essa medida
-            que serve de referência para avaliar o pêndulo. O contador tem resolução de 10 µs, o que
-            mantém o erro abaixo de 0,5 % mesmo na bola mais rápida.
+            Logo depois da boca do lançador, a bola atravessa um cronógrafo: um túnel com dois feixes
+            de luz a d = 100 mm um do outro. O relógio parte quando a bola corta o primeiro feixe e
+            para quando corta o segundo, e a velocidade é <b>v = d / t</b>. É essa medida que serve
+            de referência para avaliar o pêndulo. O relógio tem resolução de 1 µs, o que deixa o erro
+            muito abaixo de 0,1 %.
+          </p>
+          <p>
+            Cabe perceber que o cronógrafo mede a velocidade na saída do cano, e não na chegada ao
+            pêndulo. Nos 24 cm de voo, a gravidade curva a trajetória para baixo e o ar freia um pouco
+            a bola, mais as leves que as pesadas. Na câmera lenta de 1/20×, dá para acompanhar o
+            voo inteiro.
           </p>
 
           <h3>4. Para onde vai a energia</h3>
@@ -245,10 +254,11 @@
           </p>
           <p class="formula">E<sub>c</sub> depois / E<sub>c</sub> antes = m / (m + M)</p>
           <p>
-            Com a bola de aço e o pêndulo sem massas adicionais, sobram perto de 28 %. O resto vira calor,
+            Com a bola de aço e o pêndulo sem massas adicionais, sobram perto de 22 %. O resto vira calor,
             som e deformação da mola que segura a bola dentro do captador. Com a bola de náilon,
-            sobram cerca de 5 %. O choque é perfeitamente inelástico, e nenhum choque perde mais energia
-            cinética do que esse sem violar a conservação da quantidade de movimento.
+            sobram cerca de 4 %, e com a de madeira, 2 %. O choque é perfeitamente inelástico, e
+            nenhum choque perde mais energia cinética do que esse sem violar a conservação da
+            quantidade de movimento.
           </p>
 
           <h3>5. Procedimento</h3>
@@ -264,7 +274,7 @@
             </li>
             <li>Libere a catraca e repita três vezes na mesma posição, para ver a variação de um disparo a outro.</li>
             <li>Repita nas posições curta e longa, e depois com uma e com duas massas adicionais.</li>
-            <li>Troque para a bola de náilon e faça a mesma série.</li>
+            <li>Troque de bola e faça a mesma série. As seis bolas têm o mesmo diâmetro e massas que vão de 5 g a 97 g.</li>
           </ol>
 
           <h3>6. Perguntas</h3>
@@ -272,11 +282,11 @@
             <li>Que fração da energia cinética da bola se dissipou no choque em cada montagem? Compare com M / (m + M).</li>
             <li>
               Calcule a velocidade da bola igualando m · v² / 2 a (m + M) · g · h, isto é, usando
-              conservação de energia desde o disparo. Quanto esse valor erra em relação ao da fotoporta?
+              conservação de energia desde o disparo. Quanto esse valor erra em relação ao do cronógrafo?
             </li>
             <li>
-              Para a bola de náilon com duas massas adicionais, compare a subida pela régua e pelo
-              ângulo. Qual das duas dá a velocidade mais próxima da fotoporta? Por quê?
+              Para a bola de madeira com duas massas adicionais, compare a subida pela régua e pelo
+              ângulo. Qual das duas dá a velocidade mais próxima do cronógrafo? Por quê?
             </li>
             <li>
               Ao travar, a lingueta da catraca escorrega de volta até o último dente que passou. Esse
@@ -284,30 +294,38 @@
             </li>
             <li>
               No gráfico das velocidades, os pontos de cada montagem caem em retas de inclinação
-              ligeiramente diferente, umas acima de 1 e outras abaixo. O item 7 explica a razão;
-              antes de lê-lo, tente adivinhar o que muda de uma montagem para outra.
+              ligeiramente diferente, umas acima de 1 e outras abaixo. O item 7 explica as razões;
+              antes de lê-lo, olhe em câmera lenta o voo das bolas lentas e das rápidas e tente
+              adivinhar o que muda de uma montagem para outra.
             </li>
           </ol>
 
           <h3>7. O que a simulação leva em conta</h3>
           <p>
-            O pêndulo é um corpo rígido feito de partes: haste de 35 g, captador de 140 g e as massas de
+            O pêndulo é um corpo rígido feito de partes: haste de 35 g, captador de 200 g e as massas de
             50 g presas embaixo. No choque, quem se conserva em torno do eixo é o <i>momento angular</i>,
-            m · v · R = I · ω, com R = 280 mm a distância do eixo à linha do voo da bola e I o momento de
-            inércia do conjunto. O modelo do item 1 trata o pêndulo como um ponto, e só é exato quando
-            I = (m + M) · R², isto é, quando o conjunto gira como se toda a massa estivesse na altura
-            da bola. A haste, mais perto do eixo, deixa I menor que isso, e o modelo superestima a
-            velocidade; as massas adicionais, abaixo da bola, deixam I maior, e o modelo subestima. A
-            diferença fica entre −5 % e +6 %, conforme a montagem. Para quem
-            estuda corpo rígido, a fórmula sem aproximação é v = √(2 · I · (m + M) · g · h) / (m · R),
-            e o I aparece no painel quando o modelo está ligado.
+            m · v · R = I · ω, com R a distância do eixo à linha em que a bola chega (perto de 280 mm) e
+            I o momento de inércia do conjunto. O modelo do item 1 trata o pêndulo como um ponto, e só
+            é exato quando I = (m + M) · R², isto é, quando o conjunto gira como se toda a massa
+            estivesse na altura da bola. A haste, mais perto do eixo, deixa I menor que isso, e o modelo
+            superestima a velocidade; as massas adicionais, abaixo da bola, deixam I maior, e o modelo
+            subestima. Para quem estuda corpo rígido, a fórmula sem aproximação é
+            v = √(2 · I · (m + M) · g · h) / (m · R), e o I aparece no painel quando o modelo está ligado.
           </p>
           <p>
-            Além disso, o lançador é uma mola comprimida 20, 30 ou 40 mm, que empurra a bola e o êmbolo
-            juntos; a velocidade varia cerca de 0,8 % de um disparo a outro. O atrito no eixo e na
-            lingueta tira da subida uma energia proporcional ao ângulo percorrido, que pesa pouco com a
-            bola de aço (menos de 1 %) e chega a 7 % nas subidas pequenas da bola de náilon. Os dentes da
-            catraca estão a cada meio grau. A gravidade vale 9,79 m/s².
+            O cano aponta 1,5 cm acima do centro do captador. As bolas lentas caem mais no caminho e
+            entram pela parte de baixo do funil, mais longe do eixo, o que aumenta R e faz o pêndulo
+            subir mais; as rápidas entram por cima. Somados os dois efeitos, o modelo do livro erra a
+            velocidade entre −8 % e +9 %, conforme a bola, a posição e as massas.
+          </p>
+          <p>
+            Além disso, o lançador é uma mola de 3000 N/m comprimida 25, 35 ou 45 mm, que empurra a bola e
+            o êmbolo juntos, de modo que as bolas leves saem mais rápido, mas não na proporção das massas;
+            a velocidade varia cerca de 0,8 % de um disparo a outro. No voo, a bola sofre a gravidade e a
+            resistência do ar. O atrito no eixo e na lingueta tira da subida uma energia proporcional ao
+            ângulo percorrido, que pesa pouco nas bolas pesadas (menos de 1 %) e chega a 7 % nas subidas
+            pequenas da bola de madeira. Os dentes da catraca estão a cada meio grau. A gravidade vale
+            9,79 m/s².
           </p>
         </article>
       </div>

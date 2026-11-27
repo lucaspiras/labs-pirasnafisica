@@ -235,8 +235,9 @@ export function grafico({ eixoX, eixoY }) {
 /**
  * Liga os botões comuns da cena: vistas (`[data-vista]`), pausa (#bt-pausa) e
  * câmera lenta (#bt-velocidade). `est` precisa ter `pausado` e `vel`.
+ * `velocidades` é o ciclo do botão de câmera lenta.
  */
-export function barraDaCena(cena, est, avisar) {
+export function barraDaCena(cena, est, avisar, velocidades = [1, 0.5, 0.25]) {
   document.querySelectorAll('[data-vista]').forEach((b) => b.addEventListener('click', () => cena.irPara(b.dataset.vista)));
   const btPausa = document.getElementById('bt-pausa');
   btPausa.addEventListener('click', () => {
@@ -244,11 +245,11 @@ export function barraDaCena(cena, est, avisar) {
     btPausa.setAttribute('aria-pressed', String(est.pausado));
     btPausa.textContent = est.pausado ? '▶ Continuar' : '⏸ Pausar';
   });
-  const velocidades = [1, 0.5, 0.25];
   const btVel = document.getElementById('bt-velocidade');
+  const nomes = { 1: '1×', 0.5: '½×', 0.25: '¼×' };
   btVel.addEventListener('click', () => {
     est.vel = velocidades[(velocidades.indexOf(est.vel) + 1) % velocidades.length];
-    btVel.textContent = est.vel === 1 ? '1×' : est.vel === 0.5 ? '½×' : '¼×';
+    btVel.textContent = nomes[est.vel] || `1/${Math.round(1 / est.vel)}×`;
     if (est.vel !== 1) avisar('Câmera lenta: os instrumentos seguem o tempo da simulação.');
   });
 }
